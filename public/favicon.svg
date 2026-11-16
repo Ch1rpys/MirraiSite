@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110">
+  <!-- Mirrai V3「空与在」 favicon — 暗/亮自适应 -->
+  <style>
+    .surface { fill: #1B1815; }
+    .ink { stroke: #F2EDE4; }
+    .ink-fill { fill: #F2EDE4; }
+    .lamp { fill: #E4A868; }
+    .dot { fill: #141210; }
+    .axis { stroke: #F2EDE4; stroke-opacity: .22; }
+    @media (prefers-color-scheme: light) {
+      .surface { fill: #FBF8F2; }
+      .ink { stroke: #241F1A; }
+      .ink-fill { fill: #241F1A; }
+      .lamp { fill: #B4763C; }
+      .dot { fill: #F7F3EC; }
+      .axis { stroke: #241F1A; stroke-opacity: .22; }
+    }
+  </style>
+  <rect class="surface" x="2" y="2" width="106" height="106" rx="24"/>
+  <line class="axis" x1="55" y1="22" x2="55" y2="88" stroke-width="2"/>
+  <path class="ink" d="M18 34 h24 a8 8 0 0 1 8 8 v10 a8 8 0 0 1 -8 8 h-13 l-7 7 v-7 h-4 a8 8 0 0 1 -8 -8 v-10 a8 8 0 0 1 8 -8 z" fill="none" stroke-width="5.4" stroke-linejoin="round"/>
+  <path class="lamp" d="M92 34 h-24 a8 8 0 0 0 -8 8 v10 a8 8 0 0 0 8 8 h13 l7 7 v-7 h4 a8 8 0 0 0 8 -8 v-10 a8 8 0 0 0 -8 -8 z"/>
+</svg>

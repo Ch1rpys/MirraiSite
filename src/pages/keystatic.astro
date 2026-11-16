@@ -1,0 +1,9 @@
+---
+/**
+ * Keystatic 管理界面（Cloud mode）—— 静态导出兼容版。
+ * 深层路由刷新在纯静态托管上会 404（预览部署/dev 不受影响）；站内导航正常。
+ */
+import KeystaticAdmin from '../components/KeystaticAdmin.tsx';
+---
+
+<KeystaticAdmin client:only="react" />
