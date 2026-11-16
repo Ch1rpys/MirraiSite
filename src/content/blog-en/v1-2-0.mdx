@@ -1,0 +1,96 @@
+---
+title: Mirrai v1.2.0 — Nightlight & Morning Paper
+description: "When they're not by your side, they're still here."
+order: 0
+pubDate: 2026-10-22
+---
+
+# Mirrai v1.2.0 — Nightlight & Morning Paper
+
+> "When they're not by your side, they're still here."
+
+## What this is
+
+Mirrai is an open-source self-hosted AI companion app: upload real chat history, and a multi-stage distillation engine rebuilds their digital presence — their tone of voice, their catchphrases, the moments they suddenly went cold. And one thing no other product has: the **graduation mechanism**, a design that helps you say goodbye properly.
+
+## The focus of this release: the whole interface rebuilt
+
+The old interface had a design system, but it never landed. Titles were said three times — in the top bar, the kicker, and the big headline; section titles and statistic numbers looked identical; the white space wasn't designed, it collapsed; and the body font came from the Google Fonts CDN — **in China or offline, all 87 headings would degrade to the system Song typeface, and the whole product would go out of shape.**
+
+This release replaces it entirely:
+
+### 🌓 Two themes, following the system
+
+- **夜灯 Nocturne** (dark): warm ink-blue ground, amber gold as the only accent color
+- **晨纸 Vellum** (light): cream paper ground, ink-teal as the main color, brick orange as the accent
+
+### 🔤 MiSans takes over the whole site
+
+Xiaomi's variable font: the `wght` axis spans 150–700, covering every weight from Thin to Heavy, **and all 26 OpenType features are preserved intact** (SS01–SS09, frac, sups, case, vert, tnum…).
+
+The font ships with the app, no longer depending on any CDN: **a 272KB subset**, trimmed only by character set — not one glyph outline changed. Tabular numerals (`tnum`) are on site-wide, statistic numbers add `ss04` on top (level with CJK characters), and achievement progress uses `frac` to set true fractions.
+
+### 📐 Hierarchy and density
+
+- A four-level type scale is established, **statistic numbers switch to sans tabular**, and can never be mistaken for headings
+- The top bar no longer shows the page name; **a heading appears only once per page**
+- Stat blocks, tab styles, and chart palette are unified into one system site-wide
+- The lobby's width opens up and it becomes two columns, with 「今日推荐」 ("Today's picks") and 「每日来信」 ("Daily letter") side by side
+- Emotion tags in chat **appear only when the emotion changes**, no longer attached to every message
+- Charts drop the dashed grid and gradient fill; height adapts to content
+
+### 🪟 Desktop: macOS and Windows land together
+
+- **macOS**: `Mirrai-macOS-arm64.dmg`
+- **Windows**: `Mirrai-Setup-x64.exe` — an Inno Setup installer; nothing to install for the database, no admin rights, no registry writes
+
+On startup the Windows build shows **a window with a progress bar**, displaying 「正在初始化数据库 → 正在同步表结构 → 正在启动服务 → 已就绪」 ("initializing database → syncing schema → starting service → ready") in real time. First launch initializes the database and can take a minute or two — with a progress bar, you won't think it's frozen.
+
+There's a CI smoke test that actually runs it: with a normal user (PostgreSQL refuses to run as admin) it initializes the database, creates tables, starts the service, and confirms an HTTP response.
+
+## Also fixed along the way
+
+- **Couldn't log in during local dev** — the session cookie was set `SameSite=None` without `Secure`, so the browser rejected it outright over plain http; and after a successful login, `invalidate()` didn't actually refetch, so the landing page didn't budge. Local login works now.
+- **`drizzle-kit migrate` never worked** — it depended on the gitignored `drizzle/meta/`, which isn't in the desktop package, so tables couldn't be created. Switched to `drizzle-kit push`, which doesn't depend on the journal.
+- **Internal fields on the persona card** ("默契 41", "rapport 41") are gone; role badges that say nothing to an ordinary user are no longer shown.
+
+## Changes since v1.1.0
+
+- Interface fully rebuilt: dual themes, MiSans, unified type scale and density
+- macOS and Windows installers rebuilt, including all v1.1.0 changes
+- Fixed the local-dev login flow
+- Fixed database initialization in the desktop build
+
+## What v1.1.0 already brought (still in this release)
+
+- **Official WeChat ClawBot channel**: migrated from Wechaty's private protocol to Tencent's iLink protocol — zero ban risk
+- **Passwords now hashed with scrypt**: old SHA-256 accounts log in as usual and upgrade automatically at login
+- **The emotion state machine is now judged by the LLM**: decided from the persona's tone, not guessed from the user's wording
+- **Persona distillation unified into a single pipeline**
+- **Cheaper Inference provider** (12 LLM providers)
+- **`auth.me` no longer returns password hashes**
+
+## Install
+
+- **macOS (Apple Silicon)**: download `Mirrai-macOS-arm64.dmg` below, drag it into Applications, double-click to run
+- **Windows (x64)**: download `Mirrai-Setup-x64.exe` below, double-click to install
+- **Docker**: `cp .env.example .env && docker compose up -d` → http://localhost:3000
+- **Source**: see the [README quick start](https://github.com/Ch1rpys/Mirrai#快速开始)
+
+> The WeChat channel needs WeChat **8.0.70+**, and the 「微信 ClawBot」 ("WeChat ClawBot") entry must be visible under 「我 → 设置 → 插件」 (Me → Settings → Plugins). That feature is rolling out gradually, iOS first.
+
+## Upgrade steps
+
+Users upgrading from v1.1.0: if you use the desktop build, just download and install again (the database syncs itself).
+
+Source users who previously ran `pnpm db:push` should **switch to a method other than `pnpm db:push`**:
+
+```bash
+psql "$DATABASE_URL" -f drizzle/0002_wechat_clawbot_channel.sql
+```
+
+The migration is idempotent; re-running is safe. It renames `wechat_bindings.wechatContactId` to `wechatUserId`, disables the old friend bindings, and fills in the `bot_status` enum values and iLink credential fields.
+
+## A note on ethics
+
+Only upload chat history you have the right to use; get consent before modeling a real person. Mirrai's goal is to help you finish the goodbye, not to replace a real relationship.
