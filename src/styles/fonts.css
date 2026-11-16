@@ -1,0 +1,37 @@
+/* 自托管字体（woff2，font-display: swap）
+   Latin：Cormorant Garamond（字标）/ Playfair Display（标题）/ EB Garamond（长文）
+   中文：Noto Sans SC 子集（scripts/build-fonts.mjs 按站点用字生成）
+   全部 SIL OFL 许可，声明随 LICENSE-CONTENT.md 附出 */
+
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/fonts/CormorantGaramond.woff2') format('woff2');
+  font-weight: 300 700; /* 实例化 550，浏览器按需合成 */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('/fonts/EBGaramond.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans SC';
+  src: url('/fonts/NotoSansSC-Subset.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+

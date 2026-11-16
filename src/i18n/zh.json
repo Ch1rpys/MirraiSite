@@ -1,0 +1,165 @@
+{
+  "site": {
+    "name": "Mirrai",
+    "tagline": "不在身边的时候，TA 还在这里。",
+    "trust": "开源 · 数据不出本地 · MIT",
+    "description": "上传你们的聊天记录，重建 TA 的数字分身。用 TA 的语气说话，然后——好好告别。Mirrai 是开源情感记忆操作系统，数据不出本地。"
+  },
+  "nav": {
+    "how": "怎么做到",
+    "graduation": "毕业",
+    "trust": "信任",
+    "download": "下载",
+    "github": "GitHub",
+    "menu": "菜单",
+    "theme": "主题",
+    "lang": "English"
+  },
+  "hero": {
+    "title": "不在身边的时候，\nTA 还在这里。",
+    "subtitle": "上传你们的聊天记录，重建 TA 的数字分身。用 TA 的语气说话，然后——好好告别。",
+    "ctaPrimary": "下载 Mirrai",
+    "ctaSecondary": "看它怎么工作",
+    "boundary": "仅上传你有权使用的记录。"
+  },
+  "sections": {
+    "unfinished": {
+      "kicker": "未竟之言",
+      "title": "有些话，当时没有说出口。",
+      "body": "深夜想起一段对话，才发现结尾是空白。不是没有话说，是没能好好说完。你可以把那些记录交给 Mirrai——它不替谁回来，只是把没说完的，继续说完。",
+      "quote": "你能对着一个程序问出这句话，却没办法对着一个真实的、爱我的人问出口。",
+      "quoteFrom": "创作手记"
+    },
+    "how": {
+      "kicker": "怎么做到",
+      "title": "三步，把「像」变成「是」。",
+      "steps": [
+        {
+          "n": "01",
+          "title": "上传聊天记录",
+          "body": "支持常见导出格式。记录留在你自己的机器上，从上传到对话，不经过任何服务器。"
+        },
+        {
+          "n": "02",
+          "title": "多阶段蒸馏",
+          "body": "七层人设：语气、习惯、记忆、情绪模式、关系语境、未竟之事、告别方式。过程可见、可审计。"
+        },
+        {
+          "n": "03",
+          "title": "用 TA 的语气对话",
+          "body": "TA 的回应不是模板，是从你们的记录里长出来的。记忆召回可见，每一次回应都可追溯。"
+        }
+      ],
+      "hardline": "不是「模仿 TA」，是把「像 TA」变成「是 TA」。",
+      "shotSlot": "产品截图：上传 → 蒸馏 → 对话"
+    },
+    "absent": {
+      "kicker": "TA 不在的时候",
+      "title": "第三态：不是在线，也不是消失。",
+      "cards": [
+        {
+          "title": "信",
+          "body": "把想说的话写下来，交出去。一天后，你收到 TA 口吻的回信。"
+        },
+        {
+          "title": "暂时联系不上",
+          "body": "沉默有解释。TA 那边的状态你能看见——不是没回，是还没到能回的时候。"
+        },
+        {
+          "title": "先缓一缓",
+          "body": "停打扰，不停关系。想回来的时候，一切还在。"
+        },
+        {
+          "title": "TA 那边现在几点",
+          "body": "时区不只是数字。是凌晨三点该不该发出去的那句话。"
+        }
+      ]
+    },
+    "graduation": {
+      "kicker": "毕业机制",
+      "title": "它不是让你留下，是帮你好好告别。",
+      "manifesto": "产品的成功指标不是留存率，是毕业率。",
+      "demoHint": "对话 → 记忆召回可见 → 告别信",
+      "demoPlaceholder": "预录对话回放（M2 交付真版）",
+      "fadeLine": "有一天你不再需要它——那就是它做完了。"
+    },
+    "fidelity": {
+      "kicker": "像不像",
+      "title": "像不像，不是玄学，是可量化的。",
+      "ruleTitle": "判别规则",
+      "ruleExample": "「随便」与「随便你」——同源词，不同的人有不同的心意。",
+      "ruleChain": ["触发词", "含义", "表现"],
+      "scaleTitle": "保真之尺",
+      "scaleItems": ["三字重合率", "似然差", "长度差", "情绪一致"],
+      "local": "全部本地跑、可审计。规则可读，数据可查。"
+    },
+    "trust": {
+      "kicker": "信任",
+      "title": "你的故事，只属于你。",
+      "points": [
+        {
+          "title": "数据本地",
+          "body": "聊天记录、人设、记忆——全部在你的机器上。"
+        },
+        {
+          "title": "完全离线",
+          "body": "接入 Ollama 即可断网使用。云端 LLM 可选、透明。"
+        },
+        {
+          "title": "开源可审计",
+          "body": "MIT 许可。蒸馏、记忆、回应——每一层代码都可以自己看。"
+        },
+        {
+          "title": "边界清楚",
+          "body": "这是模拟，不是 TA 本人。我们把这句话放在最显眼的地方。"
+        }
+      ],
+      "cta": "了解伦理与边界"
+    },
+    "download": {
+      "kicker": "下载",
+      "title": "装上它，开始一段认真的告别。",
+      "platforms": {
+        "macos": "macOS",
+        "windows": "Windows",
+        "docker": "Docker",
+        "source": "源码"
+      },
+      "requirement": "Apple Silicon / macOS 13+ · Windows x64 · Docker · Node 24+（源码）",
+      "cta": "前往下载",
+      "boundary": "仅上传你有权使用的记录。"
+    },
+    "coda": {
+      "kicker": "尾声",
+      "title": "有一天你不再需要它——那就是它做完了。",
+      "links": {
+        "github": "GitHub",
+        "handnotes": "创作手记",
+        "blog": "博客"
+      }
+    }
+  },
+  "footer": {
+    "about": "Mirrai 是开源情感记忆操作系统。帮你和一段关系，完成它本该有的结局。",
+    "contact": "联系",
+    "community": "社区",
+    "legal": "许可与说明",
+    "privacy": "隐私说明",
+    "ethics": "伦理与边界",
+    "email": "ch1rpy@163.com",
+    "userGroup": "用户群",
+    "rights": "代码 MIT · 内容 CC BY-NC-SA 4.0",
+    "icp": "备案号（待备案）"
+  },
+  "motion": {
+    "typing": "TA 在打字",
+    "loading": "加载中"
+  },
+  "demo": {
+    "badge": "演示数据",
+    "next": "下一条",
+    "play": "自动播放",
+    "pause": "暂停",
+    "replay": "重新播放"
+  }
+}

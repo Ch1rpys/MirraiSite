@@ -1,0 +1,264 @@
+/* 基础样式：纸纹、暖光晕、选区、焦点、滚动锚点偏移 */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-ui);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-lamp) 32%, transparent);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-lamp-deep);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    transition: color 0.25s var(--ease-soft);
+  }
+
+  a:hover {
+    color: var(--color-lamp-deep);
+  }
+
+  /* 长文（伦理/手记/文档）用衬线正文 */
+  .prose-garamond {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    line-height: 1.95;
+    max-width: 38rem;
+  }
+
+  .prose-garamond p + p {
+    margin-top: 1.35em;
+  }
+
+  .prose-garamond table {
+    width: 100%;
+    margin: 1.6em 0;
+    border-collapse: collapse;
+    font-family: var(--font-ui);
+    font-size: 0.925rem;
+    line-height: 1.7;
+  }
+
+  .prose-garamond th,
+  .prose-garamond td {
+    border: 1px solid var(--color-hairline);
+    padding: 0.65em 0.9em;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .prose-garamond th {
+    color: var(--color-ink);
+    font-weight: 500;
+    background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  }
+
+  .prose-garamond td {
+    color: var(--color-ink-muted);
+  }
+
+  .prose-garamond h2 {
+    margin-top: 2.4em;
+    margin-bottom: 0.7em;
+    font-family: var(--font-ui);
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    line-height: 1.5;
+  }
+
+  .prose-garamond h3 {
+    margin-top: 1.9em;
+    margin-bottom: 0.55em;
+    font-family: var(--font-ui);
+    font-size: 1.08rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    line-height: 1.55;
+  }
+
+  .prose-garamond ul,
+  .prose-garamond ol {
+    margin: 1.2em 0;
+    padding-left: 1.35em;
+  }
+
+  .prose-garamond li + li {
+    margin-top: 0.5em;
+  }
+
+  .prose-garamond ul {
+    list-style: disc;
+  }
+
+  .prose-garamond ol {
+    list-style: decimal;
+  }
+
+  .prose-garamond blockquote {
+    margin: 1.5em 0;
+    padding-left: 1.3em;
+    border-left: 2px solid color-mix(in srgb, var(--color-lamp) 55%, transparent);
+    color: var(--color-ink);
+  }
+
+  .prose-garamond hr {
+    margin: 2.2em 0;
+    border: none;
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  .prose-garamond code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.86em;
+    padding: 0.14em 0.42em;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    color: var(--color-ink);
+  }
+
+  .prose-garamond pre {
+    margin: 1.5em 0;
+    padding: 1.1em 1.25em;
+    overflow-x: auto;
+    border: 1px solid var(--color-hairline);
+    border-radius: 10px;
+    background: var(--color-surface) !important;
+    line-height: 1.65;
+  }
+
+  .prose-garamond pre code {
+    padding: 0;
+    background: none;
+    font-size: 0.82rem;
+  }
+
+  .prose-garamond a {
+    color: var(--color-lamp-deep);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-lamp-deep) 45%, transparent);
+  }
+}
+
+@layer components {
+  /* 纸张肌理：极轻 noise，叠加在 bg 上 */
+  .texture-paper {
+    position: relative;
+  }
+
+  .texture-paper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+    z-index: 0;
+  }
+
+  .texture-paper > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 暖光晕 */
+  .glow-lamp {
+    background: radial-gradient(
+      ellipse 60% 52% at 50% 42%,
+      color-mix(in srgb, var(--color-lamp) 17%, transparent),
+      transparent 72%
+    );
+    filter: blur(2px);
+    pointer-events: none;
+  }
+
+  .hairline {
+    border-color: var(--color-hairline);
+  }
+
+  .tag-ghost {
+    border: 1px solid var(--color-hairline);
+    border-radius: 999px;
+    color: var(--color-ink-muted);
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    padding: 0.32em 0.95em;
+  }
+
+  .link-quiet {
+    color: var(--color-ink-muted);
+    text-decoration: underline;
+    text-decoration-color: var(--color-hairline);
+  }
+
+  .link-quiet:hover {
+    color: var(--color-lamp-deep);
+    text-decoration-color: var(--color-lamp-deep);
+  }
+}
+
+/* 主题在 JS 加载前的防闪烁：按系统偏好给默认（夜为品牌默认，仅当系统明示亮且未存偏好） */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --color-bg: #f7f3ec;
+    --color-surface: #fbf8f2;
+    --color-ink: #241f1a;
+    --color-ink-muted: #6b6156;
+    --color-lamp: #b4763c;
+    --color-lamp-deep: #8f5a2e;
+    --color-hairline: rgba(36, 31, 26, 0.14);
+    --shadow-lamp: 0 0 36px rgba(180, 118, 60, 0.18);
+    color-scheme: light;
+  }
+}
+
+/* 尊重系统减动效：全局降级 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

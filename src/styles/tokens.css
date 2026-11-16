@@ -1,0 +1,75 @@
+/* Mirrai design tokens — 双主题（夜 / 纸）
+   夜为默认。暖光色克制使用：logo 右气泡、强调词、CTA hover、灯的光晕。
+   亮主题小字/链接用 --color-lamp-deep (#8F5A2E ≈5.3:1)；#B4763C 仅限大字与图形。 */
+
+@import 'tailwindcss';
+
+/* ---------- 主题变量 ---------- */
+:root,
+[data-theme='night'] {
+  --color-bg: #141210;
+  --color-surface: #1b1815;
+  --color-ink: #f2ede4;
+  --color-ink-muted: #c9bfae;
+  --color-lamp: #e4a868;
+  --color-lamp-deep: #e4a868;
+  --color-hairline: rgba(242, 237, 228, 0.14);
+  --shadow-lamp: 0 0 48px rgba(228, 168, 104, 0.22);
+  color-scheme: dark;
+}
+
+[data-theme='paper'] {
+  --color-bg: #f7f3ec;
+  --color-surface: #fbf8f2;
+  --color-ink: #241f1a;
+  --color-ink-muted: #6b6156;
+  --color-lamp: #b4763c;
+  --color-lamp-deep: #8f5a2e;
+  --color-hairline: rgba(36, 31, 26, 0.14);
+  --shadow-lamp: 0 0 36px rgba(180, 118, 60, 0.18);
+  color-scheme: light;
+}
+
+/* ---------- Tailwind 映射 ---------- */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-lamp: var(--color-lamp);
+  --color-lamp-deep: var(--color-lamp-deep);
+  --color-hairline: var(--color-hairline);
+
+  --font-wordmark: 'Cormorant Garamond', 'EB Garamond', 'Liberation Serif', Georgia, serif;
+  --font-display: 'Playfair Display', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', Georgia,
+    serif;
+  /* 中文正文按规范用无衬线（Noto Sans SC）；EB Garamond 承担拉丁长文 */
+  --font-body: 'EB Garamond', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Liberation Serif',
+    Georgia, serif;
+  --font-ui: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui,
+    sans-serif;
+  --font-sans: var(--font-ui);
+
+  --tracking-wordmark: 0.22em;
+
+  --radius-bubble: 14px;
+  --radius-card: 12px;
+
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-gentle: cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+/* ---------- 基础排版比例 ---------- */
+@theme {
+  --text-display: clamp(2.4rem, 6.2vw, 4.6rem);
+  --text-display--line-height: 1.12;
+  --text-display--letter-spacing: -0.012em;
+  --text-headline: clamp(1.85rem, 3.6vw, 2.9rem);
+  --text-headline--line-height: 1.2;
+  --text-lede: clamp(1.125rem, 1.7vw, 1.375rem);
+  --text-lede--line-height: 1.85;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.9;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.75;
+}

@@ -1,0 +1,165 @@
+{
+  "site": {
+    "name": "Mirrai",
+    "tagline": "When they're not here, they're still here.",
+    "trust": "Open source · Your data never leaves your machine · MIT",
+    "description": "Upload your chat history and rebuild their digital presence. Speak in their voice, then — say goodbye properly. Mirrai is an open-source emotional memory OS. Your data never leaves your machine."
+  },
+  "nav": {
+    "how": "How it works",
+    "graduation": "Graduation",
+    "trust": "Trust",
+    "download": "Download",
+    "github": "GitHub",
+    "menu": "Menu",
+    "theme": "Theme",
+    "lang": "中文"
+  },
+  "hero": {
+    "title": "When they're not here,\nthey're still here.",
+    "subtitle": "Upload your chat history and rebuild their digital presence. Speak in their voice, then — say goodbye properly.",
+    "ctaPrimary": "Download Mirrai",
+    "ctaSecondary": "See how it works",
+    "boundary": "Only upload records you have the right to use."
+  },
+  "sections": {
+    "unfinished": {
+      "kicker": "Unfinished words",
+      "title": "Some things were left unsaid.",
+      "body": "Late at night you replay a conversation and notice it ended in blank space. Not because there was nothing left to say — because it never got said. You can hand those records to Mirrai. It doesn't bring anyone back; it simply finishes what was left unfinished.",
+      "quote": "You can ask a program this question, but you couldn't ask it to the real person who loved me.",
+      "quoteFrom": "Creator's notes"
+    },
+    "how": {
+      "kicker": "How it works",
+      "title": "Three steps, from \"like\" to \"is\".",
+      "steps": [
+        {
+          "n": "01",
+          "title": "Upload your chat history",
+          "body": "Common export formats supported. The records stay on your own machine — from upload to conversation, they never touch a server."
+        },
+        {
+          "n": "02",
+          "title": "Multi-stage distillation",
+          "body": "A seven-layer persona: voice, habits, memory, emotional patterns, relational context, unfinished business, and how they'd say goodbye. The process is visible and auditable."
+        },
+        {
+          "n": "03",
+          "title": "Talk in their voice",
+          "body": "Responses aren't templates — they grow out of your history together. Memory recall is visible; every reply is traceable."
+        }
+      ],
+      "hardline": "Not \"imitating them\" — turning \"like them\" into \"is them\".",
+      "shotSlot": "Product screenshot: upload → distill → talk"
+    },
+    "absent": {
+      "kicker": "When they're not here",
+      "title": "A third state: not online, not gone.",
+      "cards": [
+        {
+          "title": "Letters",
+          "body": "Write down what you want to say and send it. A day later, a reply arrives in their voice."
+        },
+        {
+          "title": "Can't reach them right now",
+          "body": "Silence comes with an explanation. You can see their state — not that they ignored you; they haven't reached the moment they can answer."
+        },
+        {
+          "title": "Pause for a while",
+          "body": "Stop the interruptions, not the relationship. Everything is still here when you come back."
+        },
+        {
+          "title": "What time is it on their side",
+          "body": "A time zone isn't just a number. It's whether you should send that message at three in the morning."
+        }
+      ]
+    },
+    "graduation": {
+      "kicker": "Graduation",
+      "title": "It isn't designed to keep you. It's designed to let you go.",
+      "manifesto": "The product's success metric isn't retention. It's graduation.",
+      "demoHint": "Conversation → visible memory recall → farewell letter",
+      "demoPlaceholder": "Pre-recorded conversation playback (real version ships in M2)",
+      "fadeLine": "One day you won't need it anymore — that's when it's done."
+    },
+    "fidelity": {
+      "kicker": "How true is it",
+      "title": "\"Does it feel like them\" isn't mysticism. It's measurable.",
+      "ruleTitle": "Discrimination rules",
+      "ruleExample": "\"Whatever\" vs. \"whatever you say\" — same root, different people, different hearts.",
+      "ruleChain": ["Trigger", "Meaning", "Expression"],
+      "scaleTitle": "The fidelity scale",
+      "scaleItems": ["Trigram overlap", "Likelihood gap", "Length gap", "Emotion match"],
+      "local": "Everything runs locally and is auditable. Rules are readable; data is inspectable."
+    },
+    "trust": {
+      "kicker": "Trust",
+      "title": "Your story belongs to you.",
+      "points": [
+        {
+          "title": "Local data",
+          "body": "Chat history, persona, memory — all of it stays on your machine."
+        },
+        {
+          "title": "Fully offline",
+          "body": "With Ollama it runs with the network cable pulled. Cloud LLMs are optional and transparent."
+        },
+        {
+          "title": "Open and auditable",
+          "body": "MIT licensed. Distillation, memory, responses — you can read every layer of the code."
+        },
+        {
+          "title": "Clear boundaries",
+          "body": "This is a simulation. It is not them. We put that sentence where you can't miss it."
+        }
+      ],
+      "cta": "Read the ethics and boundaries"
+    },
+    "download": {
+      "kicker": "Download",
+      "title": "Install it. Begin a serious goodbye.",
+      "platforms": {
+        "macos": "macOS",
+        "windows": "Windows",
+        "docker": "Docker",
+        "source": "Source"
+      },
+      "requirement": "Apple Silicon / macOS 13+ · Windows x64 · Docker · Node 24+ (source)",
+      "cta": "Get Mirrai",
+      "boundary": "Only upload records you have the right to use."
+    },
+    "coda": {
+      "kicker": "Coda",
+      "title": "One day you won't need it anymore — that's when it's done.",
+      "links": {
+        "github": "GitHub",
+        "handnotes": "Creator's notes",
+        "blog": "Blog"
+      }
+    }
+  },
+  "footer": {
+    "about": "Mirrai is an open-source emotional memory OS. It helps you give a relationship the ending it should have had.",
+    "contact": "Contact",
+    "community": "Community",
+    "legal": "License",
+    "privacy": "Privacy",
+    "ethics": "Ethics & boundaries",
+    "email": "ch1rpy@163.com",
+    "userGroup": "Community",
+    "rights": "Code MIT · Content CC BY-NC-SA 4.0",
+    "icp": "ICP filing (pending)"
+  },
+  "motion": {
+    "typing": "typing",
+    "loading": "loading"
+  },
+  "demo": {
+    "badge": "Demo data",
+    "next": "Next",
+    "play": "Auto play",
+    "pause": "Pause",
+    "replay": "Replay"
+  }
+}
