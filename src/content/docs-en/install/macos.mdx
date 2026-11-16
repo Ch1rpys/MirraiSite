@@ -1,0 +1,79 @@
+---
+title: I want to install Mirrai on my Mac
+description: "Download the macOS package and drag it into Applications: no command line, Node.js and PostgreSQL bundled."
+order: 30
+---
+
+If you're on an Apple Silicon Mac and would rather not touch the command line, this is how to get Mirrai installed with the package.
+
+Mirrai is **open source**, and all data stays **local** — chat history, uploaded material, and the persona itself live only on this machine.
+
+## What you need
+
+- A Mac with **Apple Silicon** (M series)
+- **macOS 13** or newer
+- No need to install Node.js or PostgreSQL first — both are bundled
+
+**How to check**: Apple menu → About This Mac. The chip line should say Apple M series, and the version should be 13 or newer.
+
+## How to do it
+
+### 1. Download the installer
+
+Open the Mirrai [GitHub Releases](https://github.com/Ch1rpys/Mirrai/releases) page and download `Mirrai-macOS-arm64.dmg`.
+
+**What you should see**: the download completes and you have a `Mirrai-macOS-arm64.dmg` file.
+
+### 2. Drag it into Applications
+
+Double-click `Mirrai-macOS-arm64.dmg` and drag the Mirrai icon into your Applications folder.
+
+**What you should see**: Mirrai shows up in Applications.
+
+### 3. Double-click to start
+
+Double-click Mirrai from Applications.
+
+**What you should see**: the app starts directly, with no complaints about missing Node.js or PostgreSQL.
+
+### 4. Open Mirrai
+
+Once it's up, open `http://localhost:3000` in your browser.
+
+**What you should see**: the Mirrai interface appears. The first visit walks you through creating a local account (username + password, stored only on this machine). Once you're here, the install is done.
+
+## What it brings for you
+
+The package is complete — nothing else to install:
+
+- **Node.js** and **PostgreSQL** are built in;
+- **Redis** is bundled too (inside `Mirrai.app`), and the app starts and stops it by itself. Rate limits and proactive reminders stay consistent because of it — nothing for you to configure;
+- To turn shared storage off, put `MIRRAI_REDIS=off` in `.env`.
+
+## What it does on startup
+
+After the double-click, the app brings up its bundled pieces together: PostgreSQL, Redis, and then the Mirrai service. You don't have to sequence any of it.
+
+**What you should see**: no error windows; once it settles, `http://localhost:3000` opens.
+
+## Where you land after installing
+
+Signing in brings you to the **lobby** — where all your presences live, one click to switch, contexts kept apart. The sample presence is there too, so you can say a few words without uploading anything.
+
+## If port 3000 is taken
+
+The service port defaults to `3000`. If it's occupied, change `PORT` in `.env` to another number and start the app again.
+
+**What you should see**: after the change, opening that port in your browser shows Mirrai.
+
+## Want to build the installer yourself
+
+```bash
+bash scripts/build-macos-app.sh
+```
+
+See `docs/macos-build-guide.md` in the [repository](https://github.com/Ch1rpys/Mirrai).
+
+## What's next
+
+Once it's installed, the first thing to do is usually upload chat history and distill them — see [I want to upload chat history and distill them](/en/docs/usage/upload-distill).

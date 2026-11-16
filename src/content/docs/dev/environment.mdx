@@ -1,0 +1,101 @@
+---
+title: 我想把开发环境跑起来
+description: 从克隆仓库到 localhost:3000 跑起来的完整步骤，含测试与常用命令。
+order: 140
+---
+
+当你想在本地把 Mirrai 跑起来改代码时，读这篇。假设你已经有 git，并且能装好 PostgreSQL。
+
+## 前置要求
+
+| 工具 | 版本 | 用途 |
+|---|---|---|
+| Node.js | 24+ | 跑服务端和前端 |
+| pnpm | — | 装依赖、跑脚本 |
+| PostgreSQL | 14+ | 主数据库 |
+| Python | 3.9+（可选） | 性格蒸馏引擎（skill-engine）需要 |
+
+## 跑起来
+
+### 1. 克隆并安装依赖
+
+```bash
+git clone https://github.com/Ch1rpys/Mirrai.git
+cd Mirrai
+pnpm install
+pip3 install -r skill-engine/requirements.txt   # 可选，不用蒸馏可以跳过
+```
+
+**你应该看到**：`pnpm install` 正常结束没有报错；跳过 Python 依赖也不影响启动，只是性格蒸馏跑不了。
+
+### 2. 配置环境变量
+
+```bash
+cp .env.example .env
+```
+
+编辑 `.env`，至少填三样：
+
+```bash
+DATABASE_URL=postgresql://postgres:password@localhost:5432/mirrai
+JWT_SECRET=<随机 32+ 字符>
+OPENAI_API_KEY=<至少一家 LLM 提供商的 Key>
+```
+
+必填的是 `DATABASE_URL` 和 `JWT_SECRET`（生产环境缺失会拒绝启动），外加至少一家 LLM 提供商。可选变量见 `.env.example` 里的注释，也可以看[我想配置一家 LLM 提供商](/docs/llm/providers)。
+
+### 3. 初始化数据库并启动
+
+先建库，再把表结构推上去：
+
+```bash
+createdb mirrai
+pnpm db:push
+pnpm dev
+```
+
+全新安装用 `db:push`；已有安装升级才用 `pnpm db:migrate`（区别见[我遇到了问题](/docs/faq)）。
+
+**你应该看到**：终端里出现服务启动的日志，没有报错；打开 [http://localhost:3000](http://localhost:3000) 能看到落地页。注册一个账号后进大厅，创建示例分身聊两句，回复逐 token 流出——到这里开发环境就绪了。
+
+### 用 Docker 代替也行
+
+```bash
+docker compose up -d
+```
+
+PostgreSQL 已包含在内，无需额外安装，同样访问 [http://localhost:3000](http://localhost:3000)。
+
+## 常用命令
+
+| 命令 | 作用 |
+|---|---|
+| `pnpm dev` | 启动开发服务器（HMR） |
+| `pnpm build` | 构建生产版本 |
+| `pnpm start` | 运行生产版本 |
+| `pnpm check` | TypeScript 类型检查 |
+| `pnpm test` | 运行测试 |
+| `pnpm db:push` | 把当前表结构推到数据库（全新安装） |
+| `pnpm db:migrate` | 按顺序执行迁移文件（已有安装升级） |
+| `pnpm setup:redis` | 装一个 Redis（可选） |
+
+## 测试与类型检查
+
+仓库里有 vitest 测试套件，提 PR 前请跑一遍：
+
+```bash
+pnpm check
+pnpm test
+```
+
+**你应该看到**：`pnpm check` 没有类型错误，`pnpm test` 里的测试全部通过。改了接口定义尤其要跑 `pnpm check`——全链路类型安全，改一处会全栈报错，这是设计，不是坏消息。
+
+## Redis 要不要装
+
+开发时不用。限流会退回进程内计数，功能不受影响。想试多实例行为，再跑 `pnpm setup:redis`。
+
+## 下一步
+
+- 改代码前先看[我想了解整体架构](/docs/dev/architecture)。
+- 想从脚本调用接口，看[我想调用接口](/docs/dev/api)。
+- 准备提 PR，看[我想贡献代码](/docs/dev/contributing)。

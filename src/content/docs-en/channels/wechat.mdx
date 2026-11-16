@@ -1,0 +1,79 @@
+---
+title: I want to talk to them on WeChat
+description: Authorize the official WeChat ClawBot plugin with a QR code and chat with a persona inside WeChat.
+order: 90
+---
+
+Read this when a persona already exists on the web app and you want to talk to them directly inside WeChat. The WeChat channel uses the official WeChat "ClawBot" plugin (Tencent's iLink protocol) — no third-party protocol involved.
+
+## Before you start
+
+- WeChat client version **8.0.70 or newer**.
+- The "WeChat ClawBot" entry must be visible under Me → Settings → Plugins. This feature is rolling out gradually (iOS first, Android and desktop later); if you don't see the entry, it hasn't reached your account yet.
+- The Mirrai server is running and the web app chats normally.
+- Enable the channel in `.env`:
+
+```bash
+WECHAT_ENABLED=true
+```
+
+After a restart, you should see the WeChat channel card under Settings → Channels in the web app.
+
+## Scan to authorize
+
+1. Open Settings → Channels and click "Start login" on the WeChat card.
+2. An authorization QR code appears. Scan it with WeChat and confirm.
+3. When authorization completes, the channel status becomes "Connected" and a ClawBot conversation appears on the WeChat side.
+
+**What you should see**: "Connected" on the channel card; send "hello" to the ClawBot in WeChat and the persona replies.
+
+> WeChat's authorization QR code is short-lived (about 90 seconds in practice). Mirrai replaces it automatically once it expires and keeps refreshing as long as the connection window stays open — you don't need to start over.
+
+## Chatting in WeChat
+
+The WeChat side is 1:1 private chat (official restriction: the bot cannot be added by others and cannot join groups), and the conversation is with yourself. The web app and WeChat share one persona and one memory — wherever you chat, they remember.
+
+The default persona is chosen on the web app. To switch to someone else, use a command in WeChat; a command switch applies only to the current session.
+
+## What is shared with the web app
+
+- **One persona and one memory**: wherever you chat, they remember.
+- **One chat pipeline** (`server/chat/service.ts`): web, streaming, WeChat, and Feishu run the same conversation logic.
+- **One message history**: messages carry a channel mark (web / wechat), so the history shows where each line was said.
+- **One default persona**: chosen on the web app, temporarily switched with a command in WeChat.
+- **One export**: exporting all data includes the WeChat-side conversation too.
+
+## WeChat commands
+
+| Command | What it does |
+|---|---|
+| `/使用 <persona name>` | Switch the persona for this conversation |
+| `/分身列表` | List all available personas |
+| `/当前分身` | Show who you're talking to |
+| `/毕业` | Generate the farewell letter and graduate |
+
+Replace the angle-bracketed part with your own persona's name, for example `/使用 Xiaoyu`. Not sure of the name? Send `/分身列表` first.
+
+**What you should see**: `/当前分身` returns a message naming the current persona; after `/使用 Xiaoyu`, the next reply comes in Xiaoyu's voice.
+
+## Channel environment variables
+
+| Variable | Meaning | Default |
+|---|---|---|
+| `WECHAT_ENABLED` | Enable the WeChat channel (`true` / `false`) | `false` |
+| `WECHAT_BOT_TYPE` | bot_type used for QR login | `3` |
+| `WECHAT_ILINK_BASE_URL` | Tencent iLink API base URL | `https://ilinkai.weixin.qq.com` |
+| `WECHAT_ILINK_CDN_URL` | Tencent iLink CDN URL | `https://novac2c.cdn.weixin.qq.com/c2c` |
+| `WECHAT_ILINK_APP_ID` | iLink app identifier | `bot` |
+| `WECHAT_ROUTE_TAG` | Optional deployment routing tag | empty |
+| `APP_VERSION` | App version reported as `channel_version` | `1.0.0` |
+
+Usually only `WECHAT_ENABLED` needs changing; leave the rest at their defaults.
+
+## Stopping the channel
+
+Click "Stop" on the channel card in Settings → Channels. Bindings are kept — next time, click "Start login" and scan again.
+
+## The "WeChat ClawBot" entry is missing
+
+This is not a Mirrai configuration problem: the gradual rollout hasn't covered your account yet. Update to the latest WeChat version and check Me → Settings → Plugins again. In the meantime, use the web app or the [Feishu channel](/en/docs/channels/feishu) — the persona and memory are the same, so nothing is lost. For other symptoms, see [I hit a problem](/en/docs/faq).

@@ -1,0 +1,79 @@
+---
+title: 我想在 Mac 上装好
+description: 下载 macOS 安装包并拖进应用程序：无需命令行，内置 Node.js 与 PostgreSQL。
+order: 30
+---
+
+如果你用的是 Apple Silicon 的 Mac、不想碰命令行，这篇讲怎么用安装包把 Mirrai 装好。
+
+Mirrai 是**开源**的，数据全部留在**本地**——聊天记录、上传的素材、生成的人设，都只在这台机器上。
+
+## 你需要准备什么
+
+- **Apple Silicon**（M 系列）的 Mac
+- **macOS 13** 或更高
+- 不需要预先安装 Node.js 或 PostgreSQL——安装包里都带着
+
+**怎么确认**：点左上角苹果菜单 →「关于本机」，芯片一栏是 Apple M 系列、系统版本 13 或更高即可。
+
+## 怎么做
+
+### 1. 下载安装包
+
+打开 Mirrai 的 [GitHub Releases](https://github.com/Ch1rpys/Mirrai/releases) 页面，下载 `Mirrai-macOS-arm64.dmg`。
+
+**预期看到什么**：下载完成，得到一个 `Mirrai-macOS-arm64.dmg` 文件。
+
+### 2. 拖进「应用程序」
+
+双击 `Mirrai-macOS-arm64.dmg`，把 Mirrai 图标拖进「应用程序」（Applications）文件夹。
+
+**预期看到什么**：「应用程序」文件夹里出现 Mirrai。
+
+### 3. 双击启动
+
+从「应用程序」里双击 Mirrai。
+
+**预期看到什么**：应用直接跑起来，不会提示缺少 Node.js 或 PostgreSQL 之类的依赖。
+
+### 4. 打开 Mirrai
+
+启动完成后，浏览器打开 `http://localhost:3000`。
+
+**预期看到什么**：Mirrai 的界面出现。第一次打开会引导你创建本地账号（用户名 + 密码，账号只存在这台机器上）。到这一步，装好了。
+
+## 它替你带了什么
+
+安装包是全的，不需要再装任何东西：
+
+- **Node.js** 和 **PostgreSQL** 内置；
+- **Redis** 也带着（在 `Mirrai.app` 内部），应用自己起、自己停。限流额度和主动提醒靠它对齐，你什么都不用配；
+- 不想用共享存储的话，把 `MIRRAI_REDIS=off` 写进 `.env`。
+
+## 启动的时候它在做什么
+
+双击之后，应用会把内置的东西一起带起来：PostgreSQL、Redis，然后是 Mirrai 的服务。你不用管它们谁先谁后。
+
+**预期看到什么**：没有报错窗口；等它跑完，`http://localhost:3000` 能打开。
+
+## 装好之后你会在哪里
+
+登录进来就是**大厅**——你所有的分身都住在这里，一键切换，上下文互不打扰。示例分身也在，不用上传任何素材就能先聊两句。
+
+## 如果 3000 端口被占了
+
+服务端口默认是 `3000`。被占用的话，在 `.env` 里把 `PORT` 改成别的数字，再启动一次。
+
+**预期看到什么**：改完之后，浏览器打开你改的那个端口，能看到 Mirrai。
+
+## 想自己构建安装包
+
+```bash
+bash scripts/build-macos-app.sh
+```
+
+详见[仓库](https://github.com/Ch1rpys/Mirrai)里的 `docs/macos-build-guide.md`。
+
+## 接下来
+
+装好之后，第一件事通常是上传聊天记录，把 TA 蒸馏出来——见[我想上传聊天记录，把 TA 蒸馏出来](/docs/usage/upload-distill)。

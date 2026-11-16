@@ -1,0 +1,80 @@
+---
+title: I hit a problem
+description: "Symptom-by-symptom answers: Redis, database migrations, Windows startup, the WeChat plugin entry, and where data lives."
+order: 130
+---
+
+Read this when you followed the docs but didn't get the expected result. Each entry is symptom → cause → fix.
+
+## Do I have to install Redis?
+
+No. Redis is optional: Mirrai runs without it, and rate limiting falls back to per-process counters. If you want limits to hold across multiple instances, one command installs it:
+
+```bash
+pnpm setup:redis
+```
+
+You probably don't even need to — **the installers already ship Redis**:
+
+| Install method | Where Redis comes from |
+|---|---|
+| macOS `.dmg` | Bundled inside `Mirrai.app` (`Contents/Resources/redis/`); the app starts and stops it |
+| Windows `.zip` / `.exe` | Bundled in the install directory under `redis\`; same behavior |
+| Docker | The image includes `redis-server`; `docker compose` also runs a `redis` container |
+| Source | `pnpm setup:redis` installs one (auto-detects brew / apt / apk / dnf / yum) |
+
+The app looks for Redis in this order:
+
+1. `REDIS_URL`, if you set it
+2. A Redis already running on the default port
+3. **The one bundled with the app** (macOS / Windows / Docker)
+4. **One it starts itself** — on a port of its choosing, recorded under `MIRRAI_DATA_ROOT` so other Mirrai processes on the machine share it
+
+If no `redis-server` exists at all, startup is unaffected: rate limiting falls back to per-process counters and the log says so explicitly.
+
+**To turn the shared store off**, put this in `.env`:
+
+```bash
+MIRRAI_REDIS=off
+```
+
+After a restart, the app neither looks for Redis nor starts its own.
+
+## `pnpm db:push` or `pnpm db:migrate`?
+
+Depends on your install:
+
+- **Fresh install**: `pnpm db:push`. It pushes the current schema straight onto the database — fastest path.
+- **Existing install upgrading to a new version**: `pnpm db:migrate`. It runs the migration files under `drizzle/` in order.
+
+`db:migrate` only works on installs that have already run `db:push`: the migrator skips the `0000` / `0001` full-schema dumps because they assume the base tables exist. On a fresh install those tables don't exist, so running migrations yields an empty database — fresh installs should use `db:push`.
+
+## PostgreSQL refuses to start on Windows
+
+Symptom: Mirrai fails at startup with a database error in the log mentioning administrator rights. Cause: **PostgreSQL refuses to run as administrator on Windows**. If you started Mirrai from an elevated command prompt, restart it as a normal user.
+
+(The Windows installer bundles Node.js and PostgreSQL — no admin rights, no registry writes. The startup window shows a progress bar: "initializing database → syncing schema → starting service → ready". The first launch takes a minute or two.)
+
+## The "WeChat ClawBot" entry is missing in WeChat
+
+It requires WeChat **8.0.70+** and the "WeChat ClawBot" entry under Me → Settings → Plugins. The feature is **rolling out gradually** (iOS first, Android and desktop later); if the entry is missing, it hasn't reached your account yet — this is not a Mirrai configuration problem. Update WeChat to the latest version and check again, or use the web app / Feishu channel meanwhile; the persona and memory are the same.
+
+## Where is my data?
+
+Everything is local; nothing is uploaded to third parties:
+
+| Content | Location |
+|---|---|
+| Uploaded material (chat logs / photos / videos) | `./uploads/` (change with `UPLOAD_DIR`) |
+| Windows one-click install data | `%APPDATA%\Mirrai` |
+| First-run credentials and data files | `MIRRAI_DATA_ROOT` (defaults to the parent of `UPLOAD_DIR`) |
+
+To move everything, point `UPLOAD_DIR` / `MIRRAI_DATA_ROOT` at the new location. Uninstalling the Windows build goes through "Apps & features"; data remains in `%APPDATA%\Mirrai` — delete that folder by hand if you want it gone.
+
+## Still stuck
+
+- Bugs and feature requests: [GitHub Issues](https://github.com/Ch1rpys/Mirrai/issues)
+- Usage questions and ideas: [GitHub Discussions](https://github.com/Ch1rpys/Mirrai/discussions)
+- Security vulnerabilities: report privately via `SECURITY.md` in the repo
+
+When filing an issue, include: version number, install method (Docker / source / installer), reproduction steps, what you saw and what you expected.

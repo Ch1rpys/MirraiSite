@@ -1,0 +1,81 @@
+---
+title: I want to call the API
+description: How the tRPC API is called, how auth works, and a minimal script example.
+order: 160
+---
+
+Read this when you want to script against Mirrai or trigger capabilities from outside the frontend. This page covers the **pattern** — it deliberately does not keep a copy of the endpoint list, which lives in the source.
+
+## How the API is exposed
+
+All business endpoints are exposed via **tRPC** (HTTP Batch + SuperJSON), called from the client through React Query hooks, type-safe throughout:
+
+```tsx
+import { trpc } from '../lib/trpc';
+
+function PersonaList() {
+  const { data } = trpc.persona.list.useQuery();
+  const send = trpc.chat.send.useMutation();
+  // ...
+}
+```
+
+- Route definitions: `server/routers.ts` (one router per domain — auth, persona, chat, memory, wechat, llmConfig, …).
+- Client wrapper: `client/src/lib/trpc.ts` (the tRPC link configuration lives there too).
+- Input/output types are inferred from the router definitions; change one place and the whole stack reports it.
+
+Three REST endpoints sit outside tRPC:
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/auth/register` | Register (username + password) |
+| `POST /api/auth/login` | Log in; returns a JWT session cookie |
+| `POST /api/chat/stream` | Streaming chat (Server-Sent Events) |
+
+## Authentication
+
+Auth is **JWT**: after `POST /api/auth/login` succeeds, the server issues a session cookie and subsequent requests carry it. `auth.me` confirms the current user; `auth.logout` signs out. In scripts, keep credentials in environment variables or a local file — never hard-code them into the repo.
+
+## Calling from a script
+
+Minimal example: log in, capture the session cookie, then call the API with it.
+
+```bash
+# 1. Log in and store the cookie in cookies.txt
+curl -s -X POST http://localhost:3000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"<username>","password":"<password>"}' \
+  -c cookies.txt
+```
+
+**What you should see**: a JSON body with the current user; `cookies.txt` gains a session cookie line.
+
+```bash
+# 2. Call a tRPC procedure with the session (HTTP batch format, same as the client sends)
+curl -s 'http://localhost:3000/<tRPC path>/auth.me?batch=1&input=%7B%7D' \
+  -b cookies.txt
+```
+
+The exact tRPC path and request shape come from the link configuration in `client/src/lib/trpc.ts` (deliberately not hard-coded here, so the docs can't drift from the code). Field names are authoritative in the router definition inside `server/routers.ts` — that is the source of truth.
+
+Streaming chat is SSE; the shape below is illustrative (exact fields live in the streaming route under `server/chat/`):
+
+```bash
+curl -N -X POST http://localhost:3000/api/chat/stream \
+  -H 'Content-Type: application/json' \
+  -b cookies.txt \
+  -d '{"personaId":"<persona id>","message":"<message text>"}'
+```
+
+**What you should see**: a continuously written event stream (`text/event-stream`) — tokens arriving one after another, with a final event marking the end of the turn.
+
+## Adding a new endpoint
+
+Follow the end-to-end chain in order; the types keep you honest:
+
+1. `drizzle/schema.ts` — if you need a new table or column.
+2. `server/db.ts` — read/write helpers.
+3. `server/routers.ts` — add a query / mutation with validated inputs.
+4. The hooks built on `client/src/lib/trpc.ts` — the client gets the types for free.
+
+For the overall structure see [I want to understand the architecture](/en/docs/dev/architecture); for pre-PR checks see [I want to contribute code](/en/docs/dev/contributing).

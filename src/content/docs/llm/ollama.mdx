@@ -1,0 +1,73 @@
+---
+title: 我想完全离线跑
+description: 用 Ollama 在本机跑模型，让聊天、人设和推理都不出机器。
+order: 120
+---
+
+当你希望聊天记录、人设和推理全部留在自己机器上、完全不联网时，读这篇。Mirrai 的所有数据本来就存在本地；配上 Ollama，推理也留在本地——数据不出机器。
+
+## 这条链路上发生了什么
+
+上传素材保存在 `./uploads/`，对话、性格蒸馏都走你配置的那一家 LLM 提供商。把提供商换成 Ollama 之后，这些调用全部落在本机的 Ollama 服务上，没有任何内容发给云端模型。
+
+## 第一步：安装 Ollama
+
+到 [ollama.com](https://ollama.com) 下载安装包，或用你系统的包管理器装。装完在终端里确认：
+
+```bash
+ollama --version
+```
+
+**你应该看到**：一行版本号，例如 `ollama version 0.x.x`。
+
+## 第二步：拉一个模型
+
+```bash
+ollama pull llama3
+ollama list
+```
+
+**你应该看到**：`ollama list` 的输出里出现 `llama3`（或你拉的其他模型名）。模型文件会下到本机，之后推理不再需要联网。
+
+拉取哪个模型由你定；`llama3` 是默认配置用的名字，小模型快、大模型像。
+
+## 第三步：把 Mirrai 指向 Ollama
+
+编辑 `.env`：
+
+```bash
+DEFAULT_LLM_PROVIDER=ollama
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3
+```
+
+`OLLAMA_URL` 是 Ollama 的 REST 地址，默认 `http://localhost:11434`；如果你的 Ollama 跑在别的端口或别的机器上，改成实际地址。`OLLAMA_MODEL` 要和 `ollama list` 里看到的名字一致。
+
+## 第四步：验证
+
+1. 确认 Ollama 正在运行（macOS 上是菜单栏图标；Linux 上可以 `ollama serve`）。
+2. 重启 Mirrai。
+3. 打开一个分身（或示例分身），发一句「在吗」。
+
+**你应该看到**：回复逐 token 流出。断网再发一句，照样能收到回复——这正是这条链路要证明的事。
+
+## 对本地模型的预期
+
+- **速度和质量取决于你的硬件和模型大小**。本地小模型的语气还原能力通常不如云端大模型，这是取舍，不是配置错误。
+- **性格蒸馏也在本地**。蒸馏 pipeline 走的是同一家提供商，配好 Ollama 后整条链路都不出机器；只是大模型跑在本地会慢一些，进度条走完之前别关服务。
+- **换回云端随时可以**。把 `DEFAULT_LLM_PROVIDER` 改回去即可，数据都还在本地。
+
+## 连不上的时候
+
+按顺序检查这三件事：
+
+1. **Ollama 在跑吗？** macOS 看菜单栏图标；Linux 执行 `ollama serve`。
+2. **地址对吗？** 默认 `http://localhost:11434`，换过端口或跑在别的机器上，`OLLAMA_URL` 要跟着改。
+3. **模型名对吗？** `OLLAMA_MODEL` 必须和 `ollama list` 里的名字完全一致（例如 `llama3`）。
+
+**你应该看到**：`curl http://localhost:11434` 有响应；Mirrai 的回复正常流出。
+
+## 相关
+
+- 想比较各提供商的默认模型，看[我想配置一家 LLM 提供商](/docs/llm/providers)。
+- 上传素材到底放在哪，看[我遇到了问题](/docs/faq)里的「我的数据存在哪里」。

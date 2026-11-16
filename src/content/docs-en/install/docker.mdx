@@ -1,0 +1,80 @@
+---
+title: I want to get Mirrai running with Docker
+description: "Start Mirrai locally with Docker Compose: clone the repo, fill in .env, one command to launch."
+order: 10
+---
+
+If you already have Docker on your machine, this is the fastest way to get Mirrai running — PostgreSQL and Redis both come with the Compose setup, nothing extra to install.
+
+Mirrai is **open source** (MIT), and all data stays **local**: uploaded material lands in `./uploads/` and never leaves your machine.
+
+## What you need
+
+- **Docker** and **Docker Compose** (running `docker compose version` in a terminal should print a version)
+- **At least one LLM provider API key** (OpenAI, DeepSeek, Claude, and so on; for fully offline use, Ollama works too)
+
+## How to do it
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Ch1rpys/Mirrai.git
+cd Mirrai
+```
+
+**What you should see**: the command finishes without errors, and `.env.example` is in the current directory.
+
+### 2. Prepare your .env
+
+```bash
+cp .env.example .env
+```
+
+**What you should see**: a new `.env` file appears in the directory.
+
+Open `.env` in an editor and fill in at least these two things:
+
+```bash
+# 1. JWT signing secret: 32+ random characters, any string you generate yourself
+JWT_SECRET=<32+ random characters>
+
+# 2. At least one LLM provider key (OpenAI as an example)
+OPENAI_API_KEY=sk-...
+```
+
+**What you should see**: `JWT_SECRET` is no longer empty or a placeholder, and at least one provider key is filled in.
+
+If you configure more than one provider, `DEFAULT_LLM_PROVIDER` picks the default (for example `openai` / `deepseek` / `claude` / `ollama`).
+
+### 3. Start it with one command
+
+```bash
+docker compose up -d
+```
+
+**What you should see**: the terminal shows containers being created and started (output like `Started` / `Running`), with no errors. Give it a few seconds to get the database ready.
+
+### 4. Open Mirrai
+
+Visit `http://localhost:3000` in your browser.
+
+**What you should see**: the Mirrai interface appears. The first visit walks you through creating a local account (username + password, stored only on this machine). Once you're here, the install is done.
+
+## Redis is handled for you
+
+The Docker image ships with `redis-server`, and `docker compose` runs an extra `redis` container alongside it. Rate limits count across instances and reminders never go out twice — all out of the box, no configuration needed.
+
+To turn shared storage off, put `MIRRAI_REDIS=off` in `.env`.
+
+## Stop and restart
+
+```bash
+docker compose down     # stop
+docker compose up -d    # start again
+```
+
+**What you should see**: after `down` the containers are stopped; after `up -d` again, your data is still there (the database and uploaded material are kept).
+
+## One small note
+
+The service port defaults to `3000`. If that port is taken, change `PORT` in `.env` to another number and run `docker compose up -d` again.

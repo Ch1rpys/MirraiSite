@@ -1,0 +1,76 @@
+---
+title: I want to install Mirrai on Windows
+description: "Download the Windows installer: no admin rights, no registry writes, Node.js and PostgreSQL bundled."
+order: 40
+---
+
+If you're on Windows and would rather not install a database or touch the registry, this is how to get Mirrai installed with the installer.
+
+Mirrai is **open source**, and all data stays **local** — everything lives under `%APPDATA%\Mirrai` and never leaves this machine.
+
+## What you need
+
+- **Windows x64**
+- No administrator rights required, no registry writes
+- No need to install Node.js or PostgreSQL first — both are bundled
+
+## How to do it
+
+### 1. Download the installer
+
+Open the Mirrai [GitHub Releases](https://github.com/Ch1rpys/Mirrai/releases) page and download `Mirrai-Setup-x64.exe`.
+
+**What you should see**: the download completes and you have a `Mirrai-Setup-x64.exe` file.
+
+### 2. Double-click to install
+
+Double-click `Mirrai-Setup-x64.exe` and follow the prompts.
+
+**What you should see**: the install finishes normally. No administrator rights are needed at any point, and there are no registry-related problems.
+
+### 3. Start it from the Start menu
+
+After installing, double-click `Mirrai` from the Start menu (or the desktop).
+
+**What you should see**: a **window with a progress bar** opens and starts stepping through "initializing database → syncing schema → starting service → ready".
+
+### 4. Wait for "ready"
+
+When the progress window finishes, open `http://localhost:3000` in your browser.
+
+**What you should see**: the Mirrai interface appears. The first visit walks you through creating a local account (username + password). Once you're here, the install is done.
+
+## The first-start progress window
+
+The first start takes a minute or two, and the progress window shows four stages in order:
+
+1. **Initializing database**
+2. **Syncing schema**
+3. **Starting service**
+4. **Ready**
+
+**What you should see**: the four stages run one after another and end on "Ready". Sitting still for a minute or two in between is normal — it is not a hang.
+
+## Where your data lives
+
+Everything lives under `%APPDATA%\Mirrai`: the database, uploaded material, the persona, the farewell letter — all of it.
+
+Uninstall via Settings → Apps, just like any other program. The install directory also carries Redis (in `redis\`); the app starts and stops it by itself, nothing for you to manage. To turn it off, put `MIRRAI_REDIS=off` in `.env`.
+
+## One known gotcha
+
+PostgreSQL refuses to run as administrator on Windows. If you launched Mirrai from an **elevated** command prompt or terminal, start it again as a normal user.
+
+**What you should see**: started as a normal user, the progress window runs all the way to "Ready".
+
+## Want to build the installer yourself
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build-windows-app.ps1
+```
+
+Building the installer also needs Inno Setup. See `docs/windows-build-guide.md` in the [repository](https://github.com/Ch1rpys/Mirrai).
+
+## What's next
+
+Once it's installed, the first thing to do is usually upload chat history and distill them — see [I want to upload chat history and distill them](/en/docs/usage/upload-distill).

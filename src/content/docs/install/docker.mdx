@@ -1,0 +1,80 @@
+---
+title: 我想用 Docker 一条命令跑起来
+description: 用 Docker Compose 在本机启动 Mirrai：克隆仓库、填好 .env、一条命令起服务。
+order: 10
+---
+
+如果你的机器上已经装了 Docker，这是把 Mirrai 跑起来最快的方式——PostgreSQL 和 Redis 都在 Compose 里，不用单独安装。
+
+Mirrai 是**开源**的（MIT），所有数据保存在**本地**，上传的素材落在 `./uploads/`，不会离开你的机器。
+
+## 你需要准备什么
+
+- **Docker** 和 **Docker Compose**（终端里跑 `docker compose version` 能输出版本号即可）
+- **至少一个 LLM 提供商的 API Key**（比如 OpenAI、DeepSeek、Claude；想完全离线可以用 Ollama）
+
+## 怎么做
+
+### 1. 克隆仓库
+
+```bash
+git clone https://github.com/Ch1rpys/Mirrai.git
+cd Mirrai
+```
+
+**预期看到什么**：命令正常结束，当前目录里能看到 `.env.example`。
+
+### 2. 准备 .env
+
+```bash
+cp .env.example .env
+```
+
+**预期看到什么**：目录里多出一个 `.env` 文件。
+
+然后用编辑器打开 `.env`，至少填两样东西：
+
+```bash
+# 1. JWT 签名密钥：随机 32+ 字符，自己生成一串就好
+JWT_SECRET=<随机 32+ 字符>
+
+# 2. 至少一个 LLM 提供商的 Key（以 OpenAI 为例）
+OPENAI_API_KEY=sk-...
+```
+
+**预期看到什么**：`.env` 里 `JWT_SECRET` 不再是空的或占位符，且至少有一个提供商的 Key 填上了。
+
+如果配了不止一个提供商，可以用 `DEFAULT_LLM_PROVIDER` 指定默认用哪个（比如 `openai` / `deepseek` / `claude` / `ollama`）。
+
+### 3. 一条命令启动
+
+```bash
+docker compose up -d
+```
+
+**预期看到什么**：终端里看到容器被创建并启动（`Started` / `Running` 之类的输出），没有报错退出。给它几秒钟把数据库准备好。
+
+### 4. 打开 Mirrai
+
+浏览器访问 `http://localhost:3000`。
+
+**预期看到什么**：Mirrai 的界面出现。第一次打开会引导你创建本地账号（用户名 + 密码，账号只存在这台机器上）。到这一步，安装就完成了。
+
+## Redis 不用你管
+
+Docker 镜像里装好了 `redis-server`，`docker compose` 还会额外跑一个 `redis` 容器。限流额度在多实例之间算数、提醒不会送两遍——这些都是开箱即用的，不需要额外配置。
+
+如果不想用共享存储，把 `MIRRAI_REDIS=off` 写进 `.env`。
+
+## 停止与重启
+
+```bash
+docker compose down     # 停止
+docker compose up -d    # 再次启动
+```
+
+**预期看到什么**：`down` 之后容器都停了；再 `up -d` 时数据还在（数据库和上传的素材不会丢）。
+
+## 一个小提示
+
+服务端口默认是 `3000`。如果这个端口被占用了，在 `.env` 里把 `PORT` 改成别的数字，再 `docker compose up -d` 一次。

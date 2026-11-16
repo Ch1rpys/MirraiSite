@@ -1,0 +1,73 @@
+---
+title: I want to run everything offline
+description: Run a local model with Ollama so chat, persona, and inference never leave your machine.
+order: 120
+---
+
+Read this when you want chat history, persona, and inference to stay entirely on your own machine, with no network access. Mirrai already stores all data locally; with Ollama, inference stays local too — data never leaves the machine.
+
+## What happens on this path
+
+Uploaded material is saved to `./uploads/`, and both chat and persona distillation go through whichever LLM provider you configured. Switch that provider to Ollama and every call lands on the Ollama service running locally — nothing is sent to a cloud model.
+
+## Step 1: install Ollama
+
+Download it from [ollama.com](https://ollama.com) or install it with your system's package manager. Then confirm:
+
+```bash
+ollama --version
+```
+
+**What you should see**: a version line, e.g. `ollama version 0.x.x`.
+
+## Step 2: pull a model
+
+```bash
+ollama pull llama3
+ollama list
+```
+
+**What you should see**: `llama3` (or whatever you pulled) appears in the output of `ollama list`. The model file is downloaded once; inference needs no network afterwards.
+
+Which model is up to you. `llama3` is simply the name the default configuration expects: small models are fast, large models sound more like the person.
+
+## Step 3: point Mirrai at Ollama
+
+Edit `.env`:
+
+```bash
+DEFAULT_LLM_PROVIDER=ollama
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3
+```
+
+`OLLAMA_URL` is Ollama's REST endpoint, default `http://localhost:11434` — change it if Ollama runs on another port or machine. `OLLAMA_MODEL` must match a name from `ollama list`.
+
+## Step 4: verify
+
+1. Make sure Ollama is running (menu-bar icon on macOS; `ollama serve` on Linux).
+2. Restart Mirrai.
+3. Open a persona (or the sample persona) and send "hello".
+
+**What you should see**: the reply streams out token by token. Now disconnect from the network and send another message — it still replies. That is exactly what this path is meant to prove.
+
+## What to expect from a local model
+
+- **Speed and quality depend on your hardware and model size.** A small local model usually captures the persona's voice less well than a large cloud model. That's the trade-off, not a misconfiguration.
+- **Persona distillation is local too.** The distillation pipeline goes through the same provider, so with Ollama the whole chain stays on your machine — just slower on local models. Don't stop the server while the progress bar is moving.
+- **Switching back to the cloud is instant.** Change `DEFAULT_LLM_PROVIDER` back; your data was local all along.
+
+## When it won't connect
+
+Check these three things in order:
+
+1. **Is Ollama running?** Menu-bar icon on macOS; `ollama serve` on Linux.
+2. **Is the URL right?** The default is `http://localhost:11434`; if you moved the port or run it on another machine, `OLLAMA_URL` must follow.
+3. **Does the model name match?** `OLLAMA_MODEL` must be exactly a name from `ollama list` (e.g. `llama3`).
+
+**What you should see**: `curl http://localhost:11434` responds, and Mirrai's replies stream out normally.
+
+## See also
+
+- To compare default models across providers, see [I want to set up an LLM provider](/en/docs/llm/providers).
+- For where uploaded material actually lives, see "Where is my data?" in [I hit a problem](/en/docs/faq).

@@ -1,0 +1,112 @@
+---
+title: I want to run Mirrai from source
+description: "Set up a Mirrai dev environment from scratch: Node, PostgreSQL, pnpm, and the five-step start."
+order: 20
+---
+
+If you want to change code, debug, or simply avoid Docker, this is how to get Mirrai running from source.
+
+All data lives **locally** — in your PostgreSQL instance and under `./uploads/` — and never leaves your machine.
+
+## What you need
+
+- **Node.js 24+**
+- **pnpm**
+- **PostgreSQL 14+**
+- **Python 3.9+** (optional — needed for the persona distillation engine)
+
+Check that the versions are new enough:
+
+```bash
+node -v    # v24 or newer
+pnpm -v    # any output means installed
+psql --version   # 14 or newer
+python3 --version   # 3.9 or newer (optional)
+```
+
+**What you should see**: every command prints a version number at least as new as the ones above.
+
+## How to do it
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Ch1rpys/Mirrai.git
+cd Mirrai
+```
+
+**What you should see**: the command finishes without errors, and `.env.example` is in the current directory.
+
+### 2. Install dependencies
+
+```bash
+pnpm install
+pip3 install -r skill-engine/requirements.txt   # optional: needed for the distillation engine
+```
+
+**What you should see**: `pnpm install` finishes without red errors. The Python step is optional; skip it and only the distillation engine is unavailable.
+
+### 3. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` in an editor and fill in at least these three things:
+
+```bash
+# 1. Database URL (adjust for your local PostgreSQL user and password)
+DATABASE_URL=postgresql://postgres:password@localhost:5432/mirrai
+
+# 2. JWT signing secret: 32+ random characters
+JWT_SECRET=<32+ random characters>
+
+# 3. At least one LLM provider key (OpenAI as an example)
+OPENAI_API_KEY=sk-...
+```
+
+**What you should see**: `DATABASE_URL`, `JWT_SECRET`, and at least one provider key are all filled in.
+
+### 4. Initialize the database
+
+```bash
+createdb mirrai
+pnpm db:push
+```
+
+**What you should see**: `createdb` runs without errors (if it says the database already exists, it was created before — carry on), and `pnpm db:push` ends by reporting that the schema has been pushed to the database.
+
+Mind the difference between `db:push` and `db:migrate` — see the section below; using the wrong one is the usual way to end up with an empty database.
+
+### 5. Start
+
+Development mode (hot reload while you edit):
+
+```bash
+pnpm dev
+```
+
+Or production mode:
+
+```bash
+pnpm build && pnpm start
+```
+
+**What you should see**: the terminal prints service startup logs. Visit `http://localhost:3000` in your browser and the Mirrai interface appears. Once you're here, the source setup is running.
+
+## db:push or db:migrate
+
+- **Fresh install**: `pnpm db:push`. It pushes the current schema straight onto the database — the fastest route.
+- **Existing install, upgrading to a new version**: `pnpm db:migrate`. It runs the migration files under `drizzle/` in order.
+
+`db:migrate` only applies to installs that have already been `db:push`-ed: the migration tool skips the `0000` / `0001` full-database dumps, because those assume the base tables already exist. On a fresh install there are no base tables, and running migrations only gets you an empty database — so fresh installs go through `db:push`.
+
+## Redis is optional
+
+Mirrai runs without Redis: rate limiting falls back to per-process counting. If you want limits to count across instances, install one:
+
+```bash
+pnpm setup:redis
+```
+
+**What you should see**: the command installs Redis with your system package manager (brew / apt / apk / dnf / yum); the application takes it from there. To turn shared storage off, put `MIRRAI_REDIS=off` in `.env`.

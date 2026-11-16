@@ -1,0 +1,112 @@
+---
+title: 我想从源码跑起来
+description: 从零把 Mirrai 的开发环境搭起来：Node、PostgreSQL、pnpm 与五步启动流程。
+order: 20
+---
+
+如果你想改代码、调试，或者不想用 Docker，这篇讲怎么从源码把 Mirrai 跑起来。
+
+数据全部存在**本地**的 PostgreSQL 和 `./uploads/` 里，不会离开你的机器。
+
+## 你需要准备什么
+
+- **Node.js 24+**
+- **pnpm**
+- **PostgreSQL 14+**
+- **Python 3.9+**（可选——性格蒸馏引擎需要它）
+
+先确认版本都够：
+
+```bash
+node -v    # v24 或更高
+pnpm -v    # 有输出即可
+psql --version   # 14 或更高
+python3 --version   # 3.9 或更高（可选）
+```
+
+**预期看到什么**：每条命令都输出了版本号，且不低于上面写的版本。
+
+## 怎么做
+
+### 1. 克隆仓库
+
+```bash
+git clone https://github.com/Ch1rpys/Mirrai.git
+cd Mirrai
+```
+
+**预期看到什么**：命令正常结束，当前目录里能看到 `.env.example`。
+
+### 2. 安装依赖
+
+```bash
+pnpm install
+pip3 install -r skill-engine/requirements.txt   # 可选：蒸馏引擎需要
+```
+
+**预期看到什么**：`pnpm install` 正常结束，没有红色报错。Python 那条是可选的，跳过的话只是蒸馏引擎用不了。
+
+### 3. 配置环境变量
+
+```bash
+cp .env.example .env
+```
+
+用编辑器打开 `.env`，至少填三样东西：
+
+```bash
+# 1. 数据库连接串（按你本机的 PostgreSQL 账号密码改）
+DATABASE_URL=postgresql://postgres:password@localhost:5432/mirrai
+
+# 2. JWT 签名密钥：随机 32+ 字符
+JWT_SECRET=<随机 32+ 字符>
+
+# 3. 至少一个 LLM 提供商的 Key（以 OpenAI 为例）
+OPENAI_API_KEY=sk-...
+```
+
+**预期看到什么**：`.env` 里 `DATABASE_URL`、`JWT_SECRET`、至少一个提供商的 Key 都填好了。
+
+### 4. 初始化数据库
+
+```bash
+createdb mirrai
+pnpm db:push
+```
+
+**预期看到什么**：`createdb` 不报错（如果提示库已存在，说明以前建过，继续即可）；`pnpm db:push` 结束时显示表结构已经推到数据库上。
+
+注意 `db:push` 和 `db:migrate` 的区别——见下面一节，别用错。
+
+### 5. 启动
+
+开发模式（改代码即时生效）：
+
+```bash
+pnpm dev
+```
+
+或者生产模式：
+
+```bash
+pnpm build && pnpm start
+```
+
+**预期看到什么**：终端里出现服务启动的日志。浏览器打开 `http://localhost:3000`，Mirrai 的界面出现。到这一步，源码环境就跑起来了。
+
+## db:push 还是 db:migrate
+
+- **全新安装**用 `pnpm db:push`。它把当前的表结构直接推到数据库上，是最快的方式。
+- **已有安装、想升级到新版本**用 `pnpm db:migrate`。它按顺序执行 `drizzle/` 下的迁移文件。
+
+`db:migrate` 只适用于「已经 `db:push` 过」的安装：迁移工具会跳过 `0000` / `0001` 两个整库 dump，因为它们假设基础表已经存在。全新安装没有基础表，跑迁移只会得到一个空库——所以全新安装请走 `db:push`。
+
+## Redis 是可选的
+
+不装 Redis 也能跑：限流会退回进程内计数。想让限额在多实例之间算数，装一个就行：
+
+```bash
+pnpm setup:redis
+```
+
+**预期看到什么**：命令按你系统的包管理器（brew / apt / apk / dnf / yum）装好 Redis，剩下的应用自己会搞定。不想用共享存储，把 `MIRRAI_REDIS=off` 写进 `.env`。

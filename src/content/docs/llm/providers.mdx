@@ -1,0 +1,76 @@
+---
+title: 我想配置一家 LLM 提供商
+description: 在 .env 里接入 12 家 LLM 提供商中的至少一家，让分身能开口说话。
+order: 110
+---
+
+当你第一次把 Mirrai 跑起来、或者想换一家模型服务时，读这篇。Mirrai 至少要配置一家 LLM 提供商，才能生成回复。
+
+## 提供商一览
+
+| 提供商 | 协议 | 默认模型 |
+|--------|------|---------|
+| OpenAI | REST | gpt-4o |
+| Atlas Cloud | OpenAI 兼容 | google/gemini-3-flash-preview |
+| Cheaper Inference | OpenAI 兼容 | gpt-5.4-mini |
+| Claude | REST | claude-sonnet-4-6 |
+| DeepSeek | OpenAI 兼容 | deepseek-chat |
+| Kimi (月之暗面) | OpenAI 兼容 | moonshot-v1-8k |
+| 通义千问 | OpenAI 兼容 | qwen-turbo |
+| 豆包 | OpenAI 兼容 | 自定义 |
+| 302.ai | OpenAI 兼容 | 自定义 |
+| Ollama | REST | llama3 (本地) |
+| Dify | Workflow API | 自定义 |
+| 讯飞星火 | WebSocket + HMAC | v3.5 |
+
+OpenAI 兼容协议共用一个适配器，通过 `baseUrl` / `model` 区分——换个兼容服务一般只改这两个值，不用改代码。
+
+## 怎么配
+
+配置写在项目根目录的 `.env` 里。挑一家，填对应的 Key，并把默认提供商指向它：
+
+```bash
+DEFAULT_LLM_PROVIDER=openai
+OPENAI_API_KEY=sk-你的密钥
+```
+
+**你应该看到**：重启服务后，网页端设置里的默认提供商显示为 OpenAI，和示例分身说一句话能收到流式回复。
+
+各提供商对应的环境变量：
+
+| 提供商 | 变量 |
+|---|---|
+| OpenAI | `OPENAI_API_KEY`，可选 `OPENAI_BASE_URL` / `OPENAI_MODEL` |
+| Atlas Cloud | `ATLASCLOUD_API_KEY`，可选 `ATLAS_BASE_URL` / `ATLAS_MODEL` |
+| Cheaper Inference | `CHEAPER_INFERENCE_API_KEY`，可选 `CHEAPER_INFERENCE_BASE_URL` / `CHEAPER_INFERENCE_MODEL` |
+| Claude | `CLAUDE_API_KEY`，可选 `CLAUDE_MODEL` |
+| DeepSeek | `DEEPSEEK_API_KEY` |
+| Kimi | `KIMI_API_KEY` |
+| 通义千问 | `TONGYI_API_KEY`，可选 `TONGYI_MODEL` |
+| 豆包 | `DOUBAO_API_KEY`，可选 `DOUBAO_BASE_URL` / `DOUBAO_MODEL` |
+| 302.ai | `_302AI_API_KEY` |
+| Ollama | `OLLAMA_URL` / `OLLAMA_MODEL` |
+| Dify | `DIFY_API_KEY` / `DIFY_URL` |
+| 讯飞星火 | `XUNFEI_APP_ID` / `XUNFEI_API_KEY` / `XUNFEI_API_SECRET` |
+
+`DEFAULT_LLM_PROVIDER` 的取值就是提供商名：`openai` / `atlas` / `cheaperinference` / `claude` / `deepseek` / `kimi` / `ollama` / `dify` / `xunfei` / `tongyi` / `doubao` / `302ai`。
+
+> 不要把填了真实 Key 的 `.env` 提交进仓库。它应该只在你自己的机器上。
+
+## 网页端也能管
+
+除了 `.env`，网页端的 LLM 设置里也可以管理每用户的提供商配置：填 Key、换默认提供商、改 `baseUrl` / `model`。密钥只回显掩码，不回传明文。两边冲突时以你最后设置的默认提供商为准。
+
+## 验证一下
+
+1. 重启服务（改 `.env` 之后要重启才生效）。
+2. 打开一个分身（没有分身就用示例分身），发一句「在吗」。
+3. **你应该看到**：回复逐 token 流出，而不是等很久才出一整段；情感状态也会跟着变。
+
+如果回复里报「未配置提供商」之类的错误，检查 `.env` 里 Key 是否填对、`DEFAULT_LLM_PROVIDER` 是否指向有 Key 的那一家。
+
+## 换一家提供商
+
+改 `DEFAULT_LLM_PROVIDER`（或在网页端切换），重启即可。人设、记忆和聊天记录都不依赖提供商，换一家不会丢东西，TA 还是 TA。
+
+小提示：AI 回复质量取决于所选模型，推荐 GPT-4o 或 Claude 获得更好的效果。想让所有数据不出机器，看[我想完全离线跑](/docs/llm/ollama)。

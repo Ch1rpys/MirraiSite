@@ -1,0 +1,76 @@
+---
+title: I want to set up an LLM provider
+description: Wire at least one of the 12 supported LLM providers into .env so the persona can reply.
+order: 110
+---
+
+Read this the first time you get Mirrai running, or when you want to switch to a different model service. Mirrai needs at least one LLM provider configured before it can generate replies.
+
+## The provider list
+
+| Provider | Protocol | Default model |
+|--------|------|---------|
+| OpenAI | REST | gpt-4o |
+| Atlas Cloud | OpenAI compatible | google/gemini-3-flash-preview |
+| Cheaper Inference | OpenAI compatible | gpt-5.4-mini |
+| Claude | REST | claude-sonnet-4-6 |
+| DeepSeek | OpenAI compatible | deepseek-chat |
+| Kimi (Moonshot) | OpenAI compatible | moonshot-v1-8k |
+| Tongyi Qianwen | OpenAI compatible | qwen-turbo |
+| Doubao | OpenAI compatible | custom |
+| 302.ai | OpenAI compatible | custom |
+| Ollama | REST | llama3 (local) |
+| Dify | Workflow API | custom |
+| iFlytek Spark | WebSocket + HMAC | v3.5 |
+
+OpenAI-compatible providers share a single adapter, distinguished by `baseUrl` / `model` — switching to another compatible service usually means changing just those two values, with no code changes.
+
+## How to configure
+
+Configuration lives in the `.env` file at the project root. Pick a provider, fill in its key, and point the default at it:
+
+```bash
+DEFAULT_LLM_PROVIDER=openai
+OPENAI_API_KEY=sk-your-key
+```
+
+**What you should see**: after a restart, the default provider in the web app settings shows OpenAI, and sending a message to the sample persona gets a streaming reply.
+
+Environment variables per provider:
+
+| Provider | Variables |
+|---|---|
+| OpenAI | `OPENAI_API_KEY`, optional `OPENAI_BASE_URL` / `OPENAI_MODEL` |
+| Atlas Cloud | `ATLASCLOUD_API_KEY`, optional `ATLAS_BASE_URL` / `ATLAS_MODEL` |
+| Cheaper Inference | `CHEAPER_INFERENCE_API_KEY`, optional `CHEAPER_INFERENCE_BASE_URL` / `CHEAPER_INFERENCE_MODEL` |
+| Claude | `CLAUDE_API_KEY`, optional `CLAUDE_MODEL` |
+| DeepSeek | `DEEPSEEK_API_KEY` |
+| Kimi | `KIMI_API_KEY` |
+| Tongyi Qianwen | `TONGYI_API_KEY`, optional `TONGYI_MODEL` |
+| Doubao | `DOUBAO_API_KEY`, optional `DOUBAO_BASE_URL` / `DOUBAO_MODEL` |
+| 302.ai | `_302AI_API_KEY` |
+| Ollama | `OLLAMA_URL` / `OLLAMA_MODEL` |
+| Dify | `DIFY_API_KEY` / `DIFY_URL` |
+| iFlytek Spark | `XUNFEI_APP_ID` / `XUNFEI_API_KEY` / `XUNFEI_API_SECRET` |
+
+`DEFAULT_LLM_PROVIDER` takes the provider's name: `openai` / `atlas` / `cheaperinference` / `claude` / `deepseek` / `kimi` / `ollama` / `dify` / `xunfei` / `tongyi` / `doubao` / `302ai`.
+
+> Never commit a `.env` containing real keys. It should stay on your machine only.
+
+## The web app can manage this too
+
+Besides `.env`, the LLM settings in the web app manage per-user provider configuration: keys, default provider, and `baseUrl` / `model`. Keys are shown masked, never in plaintext. If the two disagree, whichever default provider you set last wins.
+
+## Verify
+
+1. Restart the server (`.env` changes need a restart).
+2. Open a persona (or the sample persona) and send "hello".
+3. **What you should see**: the reply streams out token by token instead of arriving as one block after a long wait; the emotional state updates too.
+
+If the reply says something like "no provider configured", check that the key in `.env` is correct and `DEFAULT_LLM_PROVIDER` points at a provider that actually has a key.
+
+## Switching providers
+
+Change `DEFAULT_LLM_PROVIDER` (or switch in the web app) and restart. Personas, memories, and chat history don't depend on the provider — switch away and back, nothing is lost.
+
+Tip: reply quality follows the model; GPT-4o or Claude give the best results. To keep everything — data and inference — on your own machine, see [I want to run everything offline](/en/docs/llm/ollama).

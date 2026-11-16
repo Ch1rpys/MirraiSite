@@ -1,0 +1,99 @@
+---
+title: I want to understand the architecture
+description: "Follow one chat request through the stack: client, server, channel adapters, distillation, and memory recall."
+order: 150
+---
+
+Read this before changing code, when you want to see how the pieces fit together. Written for someone opening the repo for the first time.
+
+## The big picture
+
+```
+┌──────────────────────────────────────────────────────┐
+│             Client (React 19 + Vite)                 │
+│   Wouter router · Radix UI · Tailwind · React Query  │
+└────────────────────────┬─────────────────────────────┘
+                         │ tRPC (HTTP Batch + SuperJSON)
+┌────────────────────────▼─────────────────────────────┐
+│                 Server (Express)                      │
+│   Auth routes · tRPC middleware · Static / Vite Dev   │
+│   tRPC routers: auth · persona · chat · memory ·      │
+│   emotion · wechat · llmConfig · …                    │
+│   ┌────────┐ ┌──────────┐ ┌─────────┐ ┌───────────┐  │
+│   │   DB   │ │ LLM svc  │ │ Channel │ │ skill-    │  │
+│   │Drizzle │ │ 12 prov. │ │ WeChat/ │ │ engine    │  │
+│   │   PG   │ │          │ │ Feishu  │ │ (Python)  │  │
+│   └────────┘ └──────────┘ └─────────┘ └───────────┘  │
+└──────────────────────────────────────────────────────┘
+```
+
+The client is a React 19 single-page app, the server is Express, the database is PostgreSQL with Drizzle ORM. There is exactly one channel between them — tRPC — and the types are shared.
+
+## Type safety end to end
+
+```
+Drizzle Schema → DB Helpers → tRPC Router → React Query Hook → UI
+```
+
+Where each layer lives:
+
+1. **Drizzle Schema** (`drizzle/schema.ts`) — table definitions; every type grows out of here.
+2. **DB Helpers** (`server/db.ts`) — reads and writes against those tables.
+3. **tRPC Router** (`server/routers.ts`) — the procedures exposed to the client, with validated inputs and outputs.
+4. **React Query Hook** (`client/src/lib/trpc.ts`) — where the client calls in, e.g. `trpc.persona.list.useQuery()`.
+5. **UI components** — field names and types match the server definitions exactly.
+
+Change one interface definition and the whole stack reports it — no maintaining field docs, no discovering mismatches at runtime.
+
+## The path of one message
+
+Sending a message from the web app:
+
+1. The UI hands the message to the server via a tRPC mutation.
+2. **The shared chat pipeline** (`server/chat/service.ts`) takes over: compose context (persona + memory recall + rolling summary) → call the LLM → persist.
+3. The reply streams back token by token over **SSE** (`POST /api/chat/stream`).
+
+**The key point: web, streaming, WeChat, and Feishu all go through the same `server/chat/service.ts`.** The channel adapters (`server/channels/`) only translate messages and commands — they never rewrite conversation logic. That is why adding a channel never touches the chat code.
+
+## Persona distillation: skill-engine
+
+Turning chat logs into a persona runs as a **Python subprocess** (`skill-engine/` at the repo root, wrapped server-side by `server/skill-engine/`):
+
+```
+upload material → trait extraction → structured persona → multi-source fusion → persona
+```
+
+The server tracks jobs in the `skill_jobs` table and the client polls progress. `PYTHON_PATH` overrides the interpreter; without Python everything else works — only distillation won't run.
+
+## How memory recall is scored
+
+Not every memory goes into every turn. Memory nodes are scored and the most relevant few are selected:
+
+| Factor | Weight |
+|---|---|
+| Keyword coverage (overlap with the current conversation) | 45% |
+| Freshness | 25% |
+| Category weight | 20% |
+| Manual pinning | 10% |
+
+Pinned memories are always included. Memory anchors (category = `anchor`) are always injected with a hard "do not fabricate" constraint that blocks memory hallucination. Old turns beyond the context window are compressed into a **rolling summary** rather than dropped.
+
+## Directory map
+
+| Directory | What's inside |
+|---|---|
+| `client/` | React frontend (pages, components, tRPC wrapper, PWA) |
+| `server/_core/` | Express entry, JWT auth, tRPC setup, rate limiting |
+| `server/chat/` | The chat pipeline + SSE streaming routes |
+| `server/channels/` | WeChat / Feishu adapters and shared commands |
+| `server/llm/` | LLM abstraction (one implementation per provider under `providers/`) |
+| `server/skill-engine/` | Server-side wrapper for the distillation pipeline |
+| `server/routers.ts` | All tRPC routes |
+| `drizzle/` | Schema and migration SQL |
+| `skill-engine/` | Python distillation tools (tools / prompts / registry) |
+| `shared/` | Constants and types shared by client and server |
+
+## Next steps
+
+- To call capabilities from a script, see [I want to call the API](/en/docs/dev/api).
+- To start changing code, see [I want to get the dev environment running](/en/docs/dev/environment) and [I want to contribute code](/en/docs/dev/contributing).

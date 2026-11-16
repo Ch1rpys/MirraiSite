@@ -1,0 +1,81 @@
+---
+title: 我想调用接口
+description: tRPC 接口的调用方式、鉴权与从脚本里调用的最小示例。
+order: 160
+---
+
+当你想写脚本调用 Mirrai、或者从前端之外的地方触发能力时，读这篇。这里讲调用的**模式**，不维护一份会过期的端点清单——清单以源码为准。
+
+## 接口是怎么暴露的
+
+所有业务接口通过 **tRPC** 暴露（HTTP Batch + SuperJSON），前端通过 React Query hook 调用，全程类型安全：
+
+```tsx
+import { trpc } from '../lib/trpc';
+
+function PersonaList() {
+  const { data } = trpc.persona.list.useQuery();
+  const send = trpc.chat.send.useMutation();
+  // ...
+}
+```
+
+- 路由定义：`server/routers.ts`（每个域一个 router：auth、persona、chat、memory、wechat、llmConfig……）。
+- 客户端封装：`client/src/lib/trpc.ts`（tRPC 链接的配置也在这里）。
+- 入参出参的类型从 router 定义推导，改一处全栈同步报错。
+
+另有三个 REST 端点（不经 tRPC）：
+
+| 端点 | 用途 |
+|---|---|
+| `POST /api/auth/register` | 注册（username + password） |
+| `POST /api/auth/login` | 登录，返回 JWT 会话 Cookie |
+| `POST /api/chat/stream` | 流式对话（Server-Sent Events） |
+
+## 鉴权
+
+登录靠 **JWT**：`POST /api/auth/login` 成功后服务端下发会话 Cookie，之后的请求带上它即可。`auth.me` 可以用来确认当前登录用户；`auth.logout` 退出。脚本里请把凭据放在环境变量或本机文件里，别写死进仓库。
+
+## 从脚本里调用
+
+最小示例：先登录，拿到会话 Cookie，再带着它调接口。
+
+```bash
+# 1. 登录，把 Cookie 存进 cookies.txt
+curl -s -X POST http://localhost:3000/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"<用户名>","password":"<密码>"}' \
+  -c cookies.txt
+```
+
+**你应该看到**：返回的 JSON 里有当前用户信息；`cookies.txt` 里多了一行会话 Cookie。
+
+```bash
+# 2. 带会话调一个 tRPC 过程（HTTP 批量格式，与前端发出的请求一致）
+curl -s 'http://localhost:3000/<tRPC 路径>/auth.me?batch=1&input=%7B%7D' \
+  -b cookies.txt
+```
+
+tRPC 的具体路径与请求形状，以 `client/src/lib/trpc.ts` 的链接配置为准（这里故意不写死，避免文档和代码漂移）。字段名直接看 `server/routers.ts` 里对应 router 的定义——那就是权威清单。
+
+流式对话是 SSE，形状示意如下（具体字段以 `server/chat/` 下的流式路由为准）：
+
+```bash
+curl -N -X POST http://localhost:3000/api/chat/stream \
+  -H 'Content-Type: application/json' \
+  -b cookies.txt \
+  -d '{"personaId":"<分身 ID>","message":"<消息文本>"}'
+```
+
+**你应该看到**：响应是一条不断续写的数据流（`text/event-stream`），token 一个接一个到达，最后一条事件标志着本轮结束。
+
+## 想加一个新接口
+
+按全链路的顺序改，类型会替你把关：
+
+1. `drizzle/schema.ts`——需要新表或新字段的话。
+2. `server/db.ts`——读写函数。
+3. `server/routers.ts`——加一个 query / mutation，入参用校验库定义。
+4. `client/src/lib/trpc.ts` 起的 hook——前端直接拿到类型。
+
+整体结构见[我想了解整体架构](/docs/dev/architecture)；提 PR 前的检查见[我想贡献代码](/docs/dev/contributing)。

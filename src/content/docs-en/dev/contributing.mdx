@@ -1,0 +1,80 @@
+---
+title: I want to contribute code
+description: The fork-to-PR flow, pre-PR checks, code style, and where to ask questions.
+order: 170
+---
+
+Read this when you want to send Mirrai a fix or a feature and are getting ready to open a PR. If you only want to report a bug, skip to "How to report problems".
+
+## The flow
+
+1. **Fork** the repository to your own account.
+2. **Create a branch** with a name that says what it does:
+
+```bash
+git checkout -b fix/memory-recall-scoring
+```
+
+3. **Make the change** — keep it small and complete; one PR does one thing.
+4. **Run the checks** (next section) and get them green before pushing.
+5. **Open a PR** describing what changed, why, and how you verified it. Reference the related issue number if there is one.
+
+**What you should see**: CI checks pass on the PR page; review comments arrive in the PR thread.
+
+## Before you open a PR
+
+Run all three; all three must exit with code 0:
+
+```bash
+pnpm check
+pnpm test
+pnpm fidelity:gate
+```
+
+- `pnpm check` — TypeScript type checking.
+- `pnpm test` — the repo's vitest suite.
+- `pnpm fidelity:gate` — a deterministic regression gate: a few seconds, no cost, the same answer every run. It guards bottom lines that shouldn't change silently and stops you with a non-zero exit code if they regress.
+
+Especially don't skip these if you touched interfaces, schema, or prompt-related code.
+
+## Two common extension points
+
+**Adding a new LLM provider** (OpenAI-compatible services can reuse the existing implementation):
+
+1. Implement the `LLMProvider` interface under `server/llm/providers/`.
+2. Register it in `server/llm/index.ts`.
+
+**Adding a new emotional state**:
+
+1. `drizzle/schema.ts` — add the state to the enum.
+2. `server/_core/persona-utils.ts` — add its trigger words and description.
+3. `client/src/pages/Chat.tsx` / `HomePage.tsx` — update the state display in the UI.
+
+## What to put in a PR description
+
+Three parts are enough: what changed, why, and how you verified it (which commands you ran, which paths you clicked through). PRs with screenshots or logs get reviewed faster — redact them first.
+
+## Code style
+
+- **Strict TypeScript** — no bypassing the type checker.
+- **Follow existing patterns**: new tables go `drizzle/schema.ts` → `server/db.ts` → `server/routers.ts` → client hooks; a new LLM provider implements the interface under `server/llm/providers/` and is registered in `server/llm/index.ts`.
+- **No unnecessary abstractions**. Three repeated lines beat a one-use wrapper.
+- Commit messages say *why*, not just *what*.
+
+The repo has finer detail in `CONTRIBUTING.md` (issue and PR templates live under `.github/`).
+
+## How to report problems
+
+| Situation | Where |
+|---|---|
+| Bugs and feature requests | [GitHub Issues](https://github.com/Ch1rpys/Mirrai/issues) |
+| Usage questions and ideas | [GitHub Discussions](https://github.com/Ch1rpys/Mirrai/discussions) |
+| Security vulnerabilities | Report privately via `SECURITY.md` in the repo — do not open a public issue |
+
+A good bug report includes four things: version number, install method (Docker / source / installer), reproduction steps, and observed vs. expected behavior. Attach logs where you can (redact them — never paste API keys or chat content).
+
+## License
+
+Mirrai is released under the **MIT License**. By sending a PR you contribute under the same MIT terms; any contributor-agreement specifics are governed by `CONTRIBUTING.md`.
+
+One last note: this project deals with real people and real feelings. For changes touching personas, memory, or the graduation mechanism, think about how they land on the person using it.

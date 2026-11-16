@@ -1,0 +1,76 @@
+---
+title: I want to talk to them on Feishu
+description: Create a Feishu enterprise app and chat with a persona over WebSocket long connection — no public IP needed.
+order: 100
+---
+
+Read this when you want to talk to a persona in Feishu but have no public IP address, domain, or SSL certificate. The Feishu channel uses the "receive events via long connection" (WebSocket) mode, so running on your own machine is enough.
+
+## Before you start
+
+- Permission to create an **enterprise custom app** in your Feishu organization.
+- Long connection mode does not support store apps — it must be an enterprise custom app.
+- The app must be **published and approved by an administrator** before its permissions take effect.
+- The Mirrai server is running and the web app chats normally.
+
+## Create the Feishu enterprise app
+
+1. Open the Feishu Open Platform and create an **enterprise custom app**.
+2. Note its **App ID** and **App Secret** — you'll need them next.
+3. In the app's event settings, enable **"Receive events via long connection"** mode.
+4. Which permissions and events to enable: follow the instructions shown on the Feishu card under Settings → Channels in the web app (requirements may change between versions).
+5. **Publish the app** and have an administrator approve it.
+
+**What you should see**: the app shows as published/enabled on the Open Platform, and regular members can find it in Feishu search and send it messages.
+
+## Enter the credentials in Mirrai
+
+1. Open Settings → Channels and find the Feishu card.
+2. Enter the App ID and App Secret (credentials are stored encrypted and never shown in plaintext).
+3. Click "Start".
+
+**What you should see**: the channel status becomes "Connected"; send "hello" to the app in Feishu and the persona replies. If you can't find the app, search for its name in Feishu's search box.
+
+## How it relates to the web app
+
+Feishu, WeChat, the web app, and streaming chat all share one chat pipeline (`server/chat/service.ts`), one set of commands, and one persona/memory system — adding a channel never means rewriting conversation logic.
+
+## What is shared with the web app
+
+- **One persona and one memory**: wherever you chat, they remember.
+- **One set of commands**: the four commands behave the same on every channel.
+- **One default persona**: chosen on the web app, temporarily switched with a command in Feishu — a switch applies only to the current session.
+- **One message history**: messages carry a channel mark (web / wechat / feishu), so history and exports show where each line came from.
+
+## Credentials and admins
+
+- The App ID / App Secret are **stored encrypted** by Mirrai and shown masked — never in plaintext.
+- Never paste credentials into issues or chat logs; redact them when reporting problems.
+- Your Feishu admin only has two jobs: **approve the app's release**, and confirm its permissions took effect.
+
+## Feishu commands
+
+| Command | What it does |
+|---|---|
+| `/使用 <persona name>` | Switch the persona for this conversation |
+| `/分身列表` | List all available personas |
+| `/当前分身` | Show who you're talking to |
+| `/毕业` | Generate the farewell letter and graduate |
+
+Replace the angle-bracketed part with your own persona's name, for example `/使用 Xiaoyu`.
+
+**What you should see**: `/分身列表` returns a message listing all your personas; after `/使用 Xiaoyu`, the next reply comes in Xiaoyu's voice.
+
+## Stopping the channel
+
+Click "Stop" on the channel card in Settings → Channels. Credentials and bindings are kept — click "Start" again later without re-entering anything.
+
+## Status never becomes "Connected"
+
+Check these three things in order:
+
+1. **Is the app published and approved?** Under long connection mode, permissions take effect only after approval.
+2. **Is it a store app?** Store apps don't support long connection — switch to an enterprise custom app.
+3. **Are the App ID and App Secret correct?** Re-check them on the app credentials page of the Open Platform.
+
+If everything checks out and it still won't connect, note the status text on the channel card and report it on [GitHub Issues](https://github.com/Ch1rpys/Mirrai/issues). For other common symptoms, see [I hit a problem](/en/docs/faq).

@@ -1,0 +1,99 @@
+---
+title: 我想了解整体架构
+description: 从一次聊天请求出发，看懂前后端、渠道适配、蒸馏引擎和记忆召回怎么接在一起。
+order: 150
+---
+
+当你准备改代码、想先看懂各个部分怎么接在一起时，读这篇。写给第一次打开仓库的人，不假设你读过产品文档之外的东西。
+
+## 一张图
+
+```
+┌──────────────────────────────────────────────────────┐
+│              客户端 (React 19 + Vite)                 │
+│   Wouter 路由 · Radix UI · Tailwind · React Query    │
+└────────────────────────┬─────────────────────────────┘
+                         │ tRPC (HTTP Batch + SuperJSON)
+┌────────────────────────▼─────────────────────────────┐
+│                服务端 (Express)                        │
+│   Auth 路由 · tRPC 中间件 · 静态资源 / Vite Dev        │
+│   tRPC Routers：auth · persona · chat · memory ·      │
+│   emotion · wechat · llmConfig · …                    │
+│   ┌────────┐ ┌──────────┐ ┌─────────┐ ┌───────────┐  │
+│   │  DB    │ │ LLM 服务 │ │ 渠道适配 │ │ skill-    │  │
+│   │Drizzle │ │ 12 家提供商│ │ 微信/飞书│ │ engine    │  │
+│   │  PG    │ │          │ │         │ │ (Python)  │  │
+│   └────────┘ └──────────┘ └─────────┘ └───────────┘  │
+└──────────────────────────────────────────────────────┘
+```
+
+前端是 React 19 单页应用，服务端是 Express，数据库是 PostgreSQL + Drizzle ORM。中间只有 tRPC 一条通道，前后端共享类型。
+
+## 全链路类型安全
+
+```
+Drizzle Schema → DB Helpers → tRPC Router → React Query Hook → UI 组件
+```
+
+五层各自在哪儿：
+
+1. **Drizzle Schema**（`drizzle/schema.ts`）——表结构，类型从这里长出来。
+2. **DB Helpers**（`server/db.ts`）——对表的增删改查。
+3. **tRPC Router**（`server/routers.ts`）——暴露给前端的过程（procedure），入参出参都有校验。
+4. **React Query Hook**（`client/src/lib/trpc.ts`）——前端调用处，例如 `trpc.persona.list.useQuery()`。
+5. **UI 组件**——拿到的字段名和类型与服务端定义完全一致。
+
+改一处接口定义，全栈同步报错——不用靠文档对字段，也不用等到运行时才发现不匹配。
+
+## 一条消息走过的路
+
+以网页端发一句话为例：
+
+1. UI 通过 tRPC mutation 把消息交给服务端。
+2. **对话主管线**（`server/chat/service.ts`）接手：拼上下文（人设 + 记忆召回 + 滚动摘要）→ 调 LLM → 落库。
+3. 回复经 **SSE**（`POST /api/chat/stream`）逐 token 流回界面。
+
+**关键点：微信、飞书、网页、流式对话走的是同一个 `server/chat/service.ts`。** 渠道适配层（`server/channels/`）只负责收发消息和翻译指令，不重写任何对话逻辑——这也是为什么加一个新渠道不需要动对话代码。
+
+## 性格蒸馏：skill-engine
+
+把聊天记录变成人设的 pipeline 是一个 **Python 子进程**（根目录 `skill-engine/`，服务端侧封装在 `server/skill-engine/`）：
+
+```
+上传素材 → 人物维度提取 → 结构化人设构建 → 多源融合 → 数字分身
+```
+
+服务端把任务记在 `skill_jobs` 表里，前端轮询进度。Python 路径可用 `PYTHON_PATH` 覆盖，不装 Python 时其他功能照常，只是蒸馏跑不了。
+
+## 记忆召回怎么打分
+
+每一轮回复不会把全部记忆塞进上下文，而是给记忆节点打分，取最相关的几条：
+
+| 因素 | 权重 |
+|---|---|
+| 关键词覆盖度（和当前对话的重合） | 45% |
+| 时间新鲜度 | 25% |
+| 类别权重 | 20% |
+| 人工置顶 | 10% |
+
+置顶的记忆永远带进去。记忆锚点（category = `anchor`）永远注入，并带一条「不要编造」的硬约束，挡住记忆幻觉。超出上下文窗口的旧对话会被压成**滚动摘要**，而不是直接丢掉。
+
+## 目录地图
+
+| 目录 | 里面是什么 |
+|---|---|
+| `client/` | React 前端（页面、组件、tRPC 封装、PWA） |
+| `server/_core/` | Express 入口、JWT 认证、tRPC 初始化、限流 |
+| `server/chat/` | 对话主管线 + SSE 流式路由 |
+| `server/channels/` | 微信 / 飞书渠道适配与共用指令 |
+| `server/llm/` | LLM 抽象层（`providers/` 下每家一个实现） |
+| `server/skill-engine/` | 蒸馏 pipeline 的服务端封装 |
+| `server/routers.ts` | 全部 tRPC 路由 |
+| `drizzle/` | Schema 与迁移 SQL |
+| `skill-engine/` | Python 蒸馏工具（tools / prompts / registry） |
+| `shared/` | 前后端共享常量与类型 |
+
+## 下一步
+
+- 想从脚本调用能力，看[我想调用接口](/docs/dev/api)。
+- 想动手改代码，看[我想把开发环境跑起来](/docs/dev/environment)和[我想贡献代码](/docs/dev/contributing)。

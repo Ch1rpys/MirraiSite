@@ -1,0 +1,84 @@
+---
+title: I want to talk with them
+description: The six emotional states in chat, token-by-token streaming replies, and visible memory recall.
+order: 60
+---
+
+Once the presence is built, this is how to talk with them — including how to read the emotional states, and why you can see what they remembered.
+
+Everything is **local**: your conversation history stays on this machine.
+
+## Getting started
+
+Pick the presence in the lobby, open the chat, and type.
+
+Replies arrive **token by token** (Server-Sent Events) — no staring at a spinner waiting for a whole paragraph. Interrupting, leaving, or reconnecting never leaves half a message behind.
+
+**What you should see**: the reply appears character by character; under each bubble you can see the emotional state and the memories recalled for that turn.
+
+## Emotional states: six of them, following the conversation
+
+Each presence has six emotional states that switch in real time with what you're talking about, and they shape the tone of replies. The state is shown live in the chat interface, and you can also **switch it manually**.
+
+| State | Example triggers | Behavior |
+|------|-----------|------|
+| Tender | default state | warm, caring |
+| Playful | "haha", "fun", "that's funny" | light, joking |
+| Missing | "miss you", "remember when" | gets sentimental, recalls the past |
+| Down | "sad", "hurt", "wronged" | low spirits, needs comfort |
+| Happy | "so happy", "that's great", "love you" | energetic, in a good mood |
+| Distant | "whatever", "doesn't matter", "never mind" | says little, keeps distance |
+
+**What you should see**: when a trigger word comes up, the state label near the chat updates; after you switch it manually, the tone of the replies follows.
+
+## What they remembered, you can see
+
+Under every reply it says **which memories were recalled this turn**. When they bring up something from three months ago, it was **looked up**, not **made up**.
+
+Recall works like this:
+
+- Memories are scored by **keyword coverage + recency + category weight + manual pins**, and the most relevant few go into context;
+- **Memory anchors** (always injected) carry a hard "do not fabricate" constraint that blocks memory hallucination;
+- Old conversation beyond the context window is compressed into a **rolling summary** instead of being thrown away;
+- **How many memories go into each turn is yours to set** — in settings.
+
+**What you should see**: each reply lists the memory entries it used; when they mention something old, you can point at where it came from.
+
+## Memories grow on their own
+
+After enough conversation, the presence pulls out the things worth keeping from a stretch of chat and stores them — no button to press.
+
+**Yours** and **theirs** are recorded separately: your life is yours, and the presence won't narrate it as its own.
+
+**What you should see**: after a stretch of conversation, a few new entries show up in the memory list — all of them things you actually talked about.
+
+## What happened between you changes their tone
+
+Arguments, getting back together, breakups, business trips — these can be recorded in the **relationship event stream**. Once written down, the tone of the presence follows, instead of staying frozen at the start of things.
+
+**What you should see**: after recording a big event, the next conversation weighs it accordingly.
+
+## Scene mode
+
+Built-in and custom **scene templates** (opening lines included) can be turned on or off for a presence, to change the occasion of the conversation.
+
+## It keeps an eye on the pacing
+
+The emotional safety layer is always there, and never gets in the way:
+
+- If words about self-harm or suicide appear, the presence gently "steps out of character", says something caring, and gives **local** support hotlines (nothing is reported, nothing goes online);
+- A single conversation running past 2 hours brings a line of care in the reply;
+- A day gets too chatty (more than 5 sessions), and the reply carries a line of care plus a notice bar in the interface.
+
+**What you should see**: when you've gone too long or too dense, what's added is care, not a wall.
+
+## Handy to know
+
+- **Message actions**: resend / edit / delete a single message / copy; you can also ask them to say that last one again. History scrolls back as far as you like.
+- **Beyond text**: send images and voice messages (voice is transcribed automatically).
+- **TTS reading**: Edge TTS, multiple voices.
+
+## What's next
+
+- If there are things you want to write down, or they're away right now — see [When they're not around](/en/docs/usage/letters-third-state).
+- If you feel you've talked enough — see [I want to graduate and say goodbye properly](/en/docs/usage/graduation).

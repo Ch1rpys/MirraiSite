@@ -1,0 +1,81 @@
+---
+title: I want to upload chat history and distill them
+description: Upload chats and photos, pick a distillation mode, and get a seven-layer persona with rules.
+order: 50
+---
+
+If you have chat history with them (photos count too) and want to build their digital presence, start here.
+
+## Before you start
+
+- **Only upload records you have the right to use.** Modeling a real person's persona should happen with their **consent** in advance.
+- Material is stored **locally** under `./uploads/`, never uploaded to any third party. With Ollama you can stay fully offline.
+- **Raw material quality decides persona quality** — the more chat history, the better; 100+ messages is a good floor.
+
+## What you can upload
+
+- Exported WeChat chat history as **`.txt`**
+- **CSV**
+- **Photos, videos**
+
+Just drag them into the upload area; no format conversion needed. Beyond that, Feishu, DingTalk, Slack, and email records can be pulled in through the multi-source collectors; if you use SillyTavern, you can import its character cards (PNG v2) directly.
+
+No chat history at all? The guided questionnaire can still build a persona; or try the sample presence first to get a feel for things.
+
+## How to do it
+
+### 1. Create a presence
+
+Fill in the name, your relationship, and how long you've been together.
+
+**What you should see**: the presence is created and you move on to material upload.
+
+### 2. Upload your material
+
+Drag chat history and photos into the upload area.
+
+**What you should see**: the files appear in the material list with an uploaded status.
+
+### 3. Pick a distillation mode
+
+Five named modes: **Quick / Standard / Deep / Colleague / Public-figure research**.
+
+The mode decides four things: **how much chat history is read**, **how many photos are described**, **which prompt style is used**, and roughly **how many model calls it costs**. Pick Quick when you want speed, Deep when you want detail; there are dedicated modes for colleagues and public figures. You choose it right on the upload page — no guessing.
+
+**What you should see**: your chosen mode is confirmed and distillation begins.
+
+### 4. Wait for the pipeline to finish
+
+Distillation is not "throw the logs at an AI and have it imitate". It is a multi-stage pipeline:
+
+```
+upload material → person-dimension extraction → structured persona → multi-source fusion → digital presence
+```
+
+**What you should see**: progress moves forward in real time, stage by stage; at the end you get a finished persona.
+
+## What comes out of distillation
+
+The persona has **7 layers**: **personality traits, speaking style, catchphrases, attachment type, love language, conflict style, moving moments**. The goal is not "like them" — it is "is them".
+
+Finer than those seven layers are the **discrimination rules** — they turn "like" into "is":
+
+> "When she's angry she says 'whatever you say', but if she says 'whatever' — without 'you say' — then she's truly angry."
+
+Written into "speaking style", that gets read as "she goes cold when angry". Written into **rules**, it stays itself:
+
+```
+trigger → meaning → behavior
+```
+
+Rules can be **mined from the chat history automatically**: find contrast pairs in the same context that differ by a word or two ("whatever" / "whatever you say"), have the model read out the meaning, then attach the **original quote as evidence**. Rules without evidence are dropped; rules whose trigger word doesn't appear in the evidence are dropped too. What gets mined is only a **candidate** — it enters the prompt only after you confirm it. Once inside, it is a **hard constraint**, not a style hint.
+
+## After generation, check the persona page
+
+Open the **persona profile page** and look at what the system understood them to be.
+
+**What you should see**: the seven layers and the discrimination rules are all there. Anything that feels wrong, edit on the spot — start wherever it stops sounding like them.
+
+## What's next
+
+With the persona in hand, you can say the first line — see [I want to talk with them](/en/docs/usage/chat-emotion-memory). That page covers how to read the emotional states, and why you can see what they remembered.

@@ -1,0 +1,76 @@
+---
+title: 我想在 Windows 上装好
+description: 下载 Windows 安装包：不写注册表、不需要管理员权限，内置 Node.js 与 PostgreSQL。
+order: 40
+---
+
+如果你用的是 Windows，不想装数据库、也不想动注册表，这篇讲怎么用安装包把 Mirrai 装好。
+
+Mirrai 是**开源**的，数据全部留在**本地**——都在 `%APPDATA%\Mirrai` 里，不会离开这台机器。
+
+## 你需要准备什么
+
+- **Windows x64**
+- 不需要管理员权限，不写注册表
+- 不需要预先安装 Node.js 或 PostgreSQL——安装包里都带着
+
+## 怎么做
+
+### 1. 下载安装包
+
+打开 Mirrai 的 [GitHub Releases](https://github.com/Ch1rpys/Mirrai/releases) 页面，下载 `Mirrai-Setup-x64.exe`。
+
+**预期看到什么**：下载完成，得到一个 `Mirrai-Setup-x64.exe` 文件。
+
+### 2. 双击安装
+
+双击 `Mirrai-Setup-x64.exe`，按提示走完安装。
+
+**预期看到什么**：安装正常结束。全程不需要管理员权限，也没有注册表相关的问题。
+
+### 3. 从开始菜单启动
+
+装完后，在开始菜单（或桌面）双击 `Mirrai` 启动。
+
+**预期看到什么**：弹出一个**带进度条的窗口**，开始走「正在初始化数据库 → 正在同步表结构 → 正在启动服务 → 已就绪」。
+
+### 4. 等它说「已就绪」
+
+进度窗口走完之后，浏览器打开 `http://localhost:3000`。
+
+**预期看到什么**：Mirrai 的界面出现。第一次打开会引导你创建本地账号（用户名 + 密码）。到这一步，装好了。
+
+## 第一次启动的进度窗口
+
+首次启动要一两分钟，进度窗口会依次显示四个阶段：
+
+1. **正在初始化数据库**
+2. **正在同步表结构**
+3. **正在启动服务**
+4. **已就绪**
+
+**预期看到什么**：四个阶段依次走完，最后停在「已就绪」。中途不动一两分钟是正常的，不是卡死。
+
+## 数据放在哪里
+
+所有数据都在 `%APPDATA%\Mirrai` 下面：数据库、上传的素材、生成的人设、告别信，都在这里。
+
+卸载走「设置 → 应用和功能」，和卸载普通软件一样。安装目录里还带着 Redis（`redis\`），应用自己起、自己停，不用你操心；不想用的话，把 `MIRRAI_REDIS=off` 写进 `.env`。
+
+## 一个已知的坑
+
+PostgreSQL 拒绝在 Windows 上以管理员身份运行。如果你是从**提权的**命令提示符或终端启动 Mirrai 的，换回普通用户身份再启动就好了。
+
+**预期看到什么**：用普通用户启动后，进度窗口能正常走到「已就绪」。
+
+## 想自己构建安装包
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build-windows-app.ps1
+```
+
+生成安装包还需要 Inno Setup。详见[仓库](https://github.com/Ch1rpys/Mirrai)里的 `docs/windows-build-guide.md`。
+
+## 接下来
+
+装好之后，第一件事通常是上传聊天记录，把 TA 蒸馏出来——见[我想上传聊天记录，把 TA 蒸馏出来](/docs/usage/upload-distill)。

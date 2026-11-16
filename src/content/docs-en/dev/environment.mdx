@@ -1,0 +1,101 @@
+---
+title: I want to get the dev environment running
+description: From cloning the repo to a working localhost:3000, including tests and everyday commands.
+order: 140
+---
+
+Read this when you want to run Mirrai locally and change code. It assumes you have git and can install PostgreSQL.
+
+## Prerequisites
+
+| Tool | Version | Used for |
+|---|---|---|
+| Node.js | 24+ | Server and client |
+| pnpm | — | Dependencies and scripts |
+| PostgreSQL | 14+ | Main database |
+| Python | 3.9+ (optional) | The persona distillation engine (skill-engine) |
+
+## Get it running
+
+### 1. Clone and install dependencies
+
+```bash
+git clone https://github.com/Ch1rpys/Mirrai.git
+cd Mirrai
+pnpm install
+pip3 install -r skill-engine/requirements.txt   # optional; skip if you don't need distillation
+```
+
+**What you should see**: `pnpm install` finishes without errors. Skipping the Python dependencies doesn't block startup — only persona distillation won't run.
+
+### 2. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and fill in at least these three:
+
+```bash
+DATABASE_URL=postgresql://postgres:password@localhost:5432/mirrai
+JWT_SECRET=<random string of 32+ characters>
+OPENAI_API_KEY=<an API key for at least one LLM provider>
+```
+
+`DATABASE_URL` and `JWT_SECRET` are required (production refuses to start without the latter), plus at least one LLM provider. Optional variables are documented in the comments of `.env.example`, and in [I want to set up an LLM provider](/en/docs/llm/providers).
+
+### 3. Initialize the database and start
+
+Create the database, push the schema, start the dev server:
+
+```bash
+createdb mirrai
+pnpm db:push
+pnpm dev
+```
+
+Fresh installs use `db:push`; use `pnpm db:migrate` only when upgrading an existing install (the difference is explained in [I hit a problem](/en/docs/faq)).
+
+**What you should see**: startup logs in the terminal with no errors; opening [http://localhost:3000](http://localhost:3000) shows the landing page. Register an account, create the sample persona, and send a couple of messages — the reply streams out token by token. At that point your dev environment is ready.
+
+### Docker works too
+
+```bash
+docker compose up -d
+```
+
+PostgreSQL is included; no separate install. Same URL: [http://localhost:3000](http://localhost:3000).
+
+## Everyday commands
+
+| Command | What it does |
+|---|---|
+| `pnpm dev` | Start the dev server (HMR) |
+| `pnpm build` | Build for production |
+| `pnpm start` | Run the production build |
+| `pnpm check` | TypeScript type check |
+| `pnpm test` | Run the test suite |
+| `pnpm db:push` | Push the current schema to the database (fresh installs) |
+| `pnpm db:migrate` | Run migration files in order (upgrades) |
+| `pnpm setup:redis` | Install a Redis (optional) |
+
+## Tests and type checking
+
+The repo ships a vitest suite; run it before sending a PR:
+
+```bash
+pnpm check
+pnpm test
+```
+
+**What you should see**: `pnpm check` reports no type errors, and every test under `pnpm test` passes. Run `pnpm check` especially after touching interface definitions — the stack is type-safe end to end, so one change lights up everywhere. That's by design.
+
+## Do I need Redis for development?
+
+No. Rate limiting falls back to per-process counters and features work fine. Run `pnpm setup:redis` only if you want to try multi-instance behavior.
+
+## Next steps
+
+- Read [I want to understand the architecture](/en/docs/dev/architecture) before changing code.
+- To call the API from a script, see [I want to call the API](/en/docs/dev/api).
+- Before sending a PR, see [I want to contribute code](/en/docs/dev/contributing).
