@@ -1,0 +1,70 @@
+---
+/**
+ * /privacy —— 隐私说明独立页（M2.4）
+ * 无统计脚本 / 无 Cookie / /go/* 跳转链日志计数说明 / 外部拨测说明 / localStorage 说明。
+ */
+import Base from '../layouts/Base.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+
+const locale = 'zh' as const;
+
+const points = [
+  {
+    title: '没有任何统计脚本',
+    body: '本站不接入任何第三方统计（Google Analytics、百度统计、Umami 等一律没有）。不建用户画像，不做行为分析。这与产品「数据不出本地」的立场一致。',
+  },
+  {
+    title: '没有 Cookie',
+    body: '本站不设置 Cookie。不追踪、不标记、不跨站关联。',
+  },
+  {
+    title: '下载计数只看服务器访问日志',
+    body: '下载按钮走 /go/* 跳转链。我们只用托管方的服务器访问日志粗略统计「安装包与 Docker 的点击量」——没有脚本、没有标识符、没有个人数据。计数口径仅含 macOS / Windows 安装包与 Docker 按钮，英文站合并计数；源码与其他链接为直链，不计入。',
+  },
+  {
+    title: '外部可用性拨测',
+    body: '我们用第三方免费拨测服务（UptimeRobot 类）监控站点是否在线。拨测只请求页面本身，不涉及任何访客数据。',
+  },
+  {
+    title: '主题偏好只存在你的浏览器里',
+    body: '明暗主题的选择保存在你浏览器的 localStorage，不上传、不同步、不用于识别你。清空浏览器数据即消失。',
+  },
+  {
+    title: '产品侧的数据',
+    body: 'Mirrai 产品本身的数据（聊天记录、人设、记忆）保存在你自己的机器上，与本站无关。本站只是门口——仓库在 GitHub，数据在你家。',
+  },
+];
+---
+
+<Base
+  locale={locale}
+  title="隐私说明 · Mirrai"
+  description="Mirrai 官网无统计脚本、无 Cookie。下载计数仅来自 /go/* 跳转链的服务器访问日志。主题偏好仅存 localStorage。"
+>
+  <Header locale={locale} />
+  <main class="mx-auto max-w-3xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
+    <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">隐私说明</div>
+    <h1 class="mt-4 text-headline text-ink">这里没有追踪你。</h1>
+    <p class="mt-6 text-lede text-ink-muted">
+      「数据不出本地」不是产品文案里的一句话——这个官网自己也遵守它。
+    </p>
+
+    <div class="mt-12 space-y-8">
+      {
+        points.map((p) => (
+          <div>
+            <h2 class="text-[1.12rem] font-medium text-ink">{p.title}</h2>
+            <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">{p.body}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="mt-14 text-[0.95rem] text-ink-muted">
+      对真实人物建模的同意权与使用边界，请见
+      <a class="link-quiet" href="/ethics">伦理与边界 →</a>
+    </p>
+  </main>
+  <Footer locale={locale} />
+</Base>

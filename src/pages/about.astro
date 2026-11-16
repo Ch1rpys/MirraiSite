@@ -1,0 +1,82 @@
+---
+/**
+ * /about —— 品牌故事 + 创作手记全文 + 团队 / 致谢 / 许可（M2.3）
+ */
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { SITE_REPO, REPO, SITE } from '../consts';
+
+const locale = 'zh' as const;
+const entry = await getEntry('handnotes', 'zh');
+if (!entry) throw new Error('handnotes/zh 未找到');
+const { Content } = await render(entry);
+---
+
+<Base
+  locale={locale}
+  title="关于 Mirrai · 品牌故事与创作手记"
+  description="Mirrai 词源 mirari——凝望。读完整的创作手记：一个 NLP 研究者把不敢说的话写进代码里的全过程。"
+>
+  <Header locale={locale} />
+  <main class="pb-24 pt-16 md:pt-24">
+    <!-- 品牌词源 -->
+    <section class="mx-auto max-w-3xl px-5 md:px-8">
+      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">品牌</div>
+      <h1 class="mt-4 text-headline text-ink">从 mirari——凝望。</h1>
+      <div class="prose-garamond mt-8 text-ink-muted">
+        <p>
+          「Mirrai」是自造词，词源线索来自拉丁语 <em>mirari</em>（注视、凝望）——经古法语
+          <em>mirer</em>，走进英语的 <em>mirror</em>（镜子）与 <em>mirage</em>（海市蜃楼）。
+        </p>
+        <p>
+          映照、镜像、记忆里的那个 TA。A mirror for the conversations you can't have anymore.
+        </p>
+      </div>
+    </section>
+
+    <!-- 创作手记全文 -->
+    <article class="mx-auto mt-20 max-w-3xl px-5 md:px-8">
+      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">创作手记</div>
+      <div class="prose-garamond mt-6 text-ink-muted">
+        <Content />
+      </div>
+    </article>
+
+    <!-- 团队 / 致谢 / 许可 -->
+    <section class="mx-auto mt-20 max-w-3xl px-5 md:px-8">
+      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">团队 · 致谢 · 许可</div>
+      <div class="mt-6 space-y-8">
+        <div>
+          <h2 class="text-[1.12rem] font-medium text-ink">团队</h2>
+          <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
+            Mirrai 出自一个 NLP 专业学生之手，后由社区共同维护。代码在 GitHub 上开发，讨论在
+            GitHub Discussions 里进行。
+          </p>
+        </div>
+        <div>
+          <h2 class="text-[1.12rem] font-medium text-ink">致谢</h2>
+          <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
+            感谢最早试用并说出「我好像终于可以放下了」的那些朋友——是你们让这个项目从一个人的退路，
+            变成了一些人的告别仪式。感谢开源社区：Astro、Drizzle、Ollama、以及所有我们站在上面的肩膀。
+          </p>
+        </div>
+        <div>
+          <h2 class="text-[1.12rem] font-medium text-ink">许可</h2>
+          <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
+            代码 MIT 许可；内容（文案、创作手记、图片）CC BY-NC-SA 4.0——可非商业转载，署名、同方式共享。
+            第三方字体（Cormorant Garamond / Playfair Display / EB Garamond / Noto Sans SC / Noto Serif SC）
+            为 SIL Open Font License。
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-x-8 gap-y-2 text-[0.95rem]">
+          <a class="link-quiet" href={REPO.url} target="_blank" rel="noopener">产品仓库 GitHub</a>
+          <a class="link-quiet" href={SITE_REPO.url} target="_blank" rel="noopener">官网仓库 GitHub</a>
+          <a class="link-quiet" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer locale={locale} />
+</Base>

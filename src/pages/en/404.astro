@@ -1,0 +1,41 @@
+---
+/**
+ * 404 — in keeping with the tone (M2.6): "This message didn't go through."
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+
+const locale = 'en' as const;
+---
+
+<Base
+  locale={locale}
+  title="This message didn't go through. · Mirrai"
+  description="This page doesn't exist."
+  noindex={true}
+>
+  <Header locale={locale} />
+  <main class="mx-auto flex min-h-[60vh] max-w-3xl flex-col justify-center px-5 py-24 md:px-8">
+    <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">404</div>
+    <h1 class="mt-5 text-display text-ink">This message didn't go through.</h1>
+    <p class="mt-7 max-w-xl text-lede text-ink-muted">
+      The page you're looking for isn't here — like a message that never got delivered. Head back home, or find us on GitHub.
+    </p>
+    <div class="mt-10 flex flex-wrap gap-4">
+      <a
+        href="/en/"
+        class="rounded-full bg-lamp px-7 py-3.5 text-[0.95rem] font-medium text-bg transition-opacity hover:opacity-88"
+      >
+        Back to home
+      </a>
+      <a
+        href="/en/download"
+        class="hairline rounded-full border px-7 py-3.5 text-[0.95rem] text-ink transition-colors hover:border-lamp-deep hover:text-lamp-deep"
+      >
+        Download Mirrai
+      </a>
+    </div>
+  </main>
+  <Footer locale={locale} />
+</Base>

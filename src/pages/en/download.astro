@@ -1,0 +1,195 @@
+---
+/**
+ * /en/download — three platforms + Docker, four entry points (M2.1)
+ * Counting: macOS/Windows/Docker buttons go through /go/*; source and Release notes are direct links.
+ * SHA shown for installer files only; Docker shows image digest or nothing.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+import releasesData from '../../data/releases.json';
+import { REPO, GO_LINKS, SITE } from '../../consts';
+
+const locale = 'en' as const;
+const releases = releasesData.releases ?? [];
+const latest = releases[0];
+
+const platforms = [
+  {
+    key: 'macos',
+    icon: '⌘',
+    name: 'macOS',
+    req: 'Apple Silicon · macOS 13+',
+    href: '/go/macos',
+    file: 'Mirrai-macOS-arm64.dmg',
+    counted: true,
+  },
+  {
+    key: 'windows',
+    icon: '⊞',
+    name: 'Windows',
+    req: 'Windows x64',
+    href: '/go/windows',
+    file: 'Mirrai-Setup-x64.exe',
+    counted: true,
+  },
+  {
+    key: 'docker',
+    icon: '⬢',
+    name: 'Docker',
+    req: 'Docker · docker compose',
+    href: '/go/docker',
+    file: null,
+    counted: true,
+  },
+  {
+    key: 'source',
+    icon: '</>',
+    name: 'Source',
+    req: 'Node 24+ · PostgreSQL 14+',
+    href: REPO.url,
+    file: null,
+    counted: false,
+  },
+];
+
+const fmtSize = (bytes: number) =>
+  bytes > 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`;
+---
+
+<Base
+  locale={locale}
+  title="Download Mirrai · macOS / Windows / Docker"
+  description="Download Mirrai — the open source emotional memory operating system. One-click install for macOS, Windows Setup, Docker one-line deploy, or run from source. Data stays local."
+>
+  <Header locale={locale} />
+  <main class="mx-auto max-w-6xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
+    <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Download</div>
+    <h1 class="mt-4 max-w-2xl text-headline text-ink">Install it, and begin a serious goodbye.</h1>
+    <p class="mt-6 max-w-2xl text-lede text-ink-muted">
+      {
+        latest
+          ? `Current version ${latest.version} · ${latest.publishedAt.slice(0, 10)}`
+          : 'Version information unavailable — please see GitHub Releases.'
+      }
+    </p>
+
+    <!-- Four entry cards -->
+    <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        platforms.map((p) => (
+          <a
+            href={p.href}
+            class="hairline group rounded-2xl border bg-surface/50 px-6 py-8 transition-colors hover:border-lamp-deep"
+            {...(p.counted ? {} : { target: '_blank', rel: 'noopener' })}
+          >
+            <div class="text-[1.35rem] text-lamp" aria-hidden="true">
+              {p.icon}
+            </div>
+            <div class="mt-4 text-[1.05rem] font-medium text-ink">{p.name}</div>
+            <div class="mt-1.5 text-[0.82rem] text-ink-muted">{p.req}</div>
+            {p.file && latest && (
+              <div class="mt-3 text-[0.78rem] text-ink-muted/80">
+                {p.file}
+                {(() => {
+                  const asset = latest.assets.find((a) => a.name === p.file);
+                  return asset ? ` · ${fmtSize(asset.size)}` : '';
+                })()}
+              </div>
+            )}
+            <div class="mt-4 text-[0.85rem] text-ink transition-colors group-hover:text-lamp-deep">
+              {p.key === 'source' ? 'View repository →' : 'Download →'}
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <p class="mt-8 text-[0.85rem] text-ink-muted">
+      Apple Silicon / macOS 13+ · Windows x64 · Docker · Node 24+ (source)
+    </p>
+    <p class="mt-2 text-[0.78rem] text-ink-muted/80">Only upload records you have the right to use.</p>
+
+    <!-- SHA checksums (installers only) -->
+    {
+      latest && (
+        <section class="mt-16">
+          <h2 class="text-[1.15rem] font-medium text-ink">Checksums (SHA-256)</h2>
+          <p class="mt-2 text-[0.85rem] text-ink-muted">
+            Checksums apply to installer files only. For Docker images, please verify the image digest.
+          </p>
+          <div class="hairline mt-5 overflow-hidden rounded-xl border">
+            <table class="w-full text-left text-[0.85rem]">
+              <thead>
+                <tr class="hairline border-b text-ink-muted">
+                  <th class="px-4 py-3 font-normal">File</th>
+                  <th class="px-4 py-3 font-normal">SHA-256</th>
+                </tr>
+              </thead>
+              <tbody>
+                {latest.assets
+                  .filter((a) => /\.(dmg|exe)$/i.test(a.name))
+                  .map((a) => (
+                    <tr class="hairline border-b last:border-b-0">
+                      <td class="px-4 py-3 text-ink">{a.name}</td>
+                      <td class="px-4 py-3 text-ink-muted">
+                        <span class="block break-all text-[0.78rem]">
+                          See the SHA256SUMS file included with the Release
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+          <p class="mt-3 text-[0.8rem] text-ink-muted">
+            <a class="link-quiet" href={`${latest.htmlUrl}`} target="_blank" rel="noopener">
+              View SHA256SUMS and full notes for {latest.version} →
+            </a>
+          </p>
+        </section>
+      )
+    }
+
+    <!-- Release notes (human-readable) -->
+    {
+      latest && (
+        <section class="mt-16">
+          <h2 class="text-[1.15rem] font-medium text-ink">Release notes · {latest.version}</h2>
+          <article class="prose-garamond hairline mt-5 rounded-2xl border bg-surface/40 px-6 py-8 text-ink-muted md:px-8">
+            <p class="text-[0.95rem]">
+              {latest.body.split('\n').find((l) => l.trim() && !l.startsWith('#') && !l.startsWith('>')) ??
+                'See the GitHub Release for full details.'}
+            </p>
+            <p class="mt-4">
+              <a class="link-quiet text-[0.95rem]" href={latest.htmlUrl} target="_blank" rel="noopener">
+                Read the full release notes →
+              </a>
+            </p>
+          </article>
+        </section>
+      )
+    }
+
+    <!-- Version history -->
+    <section class="mt-16">
+      <h2 class="text-[1.15rem] font-medium text-ink">Version history</h2>
+      <ul class="mt-5 space-y-3">
+        {
+          releases.map((r) => (
+            <li class="hairline flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 rounded-xl border px-5 py-4">
+              <a href={r.htmlUrl} target="_blank" rel="noopener" class="text-ink hover:text-lamp-deep">
+                {r.version}
+              </a>
+              <span class="text-[0.82rem] text-ink-muted">{r.publishedAt.slice(0, 10)}</span>
+              <a href={r.htmlUrl} target="_blank" rel="noopener" class="link-quiet text-[0.82rem]">
+                Release notes
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+  <Footer locale={locale} />
+</Base>

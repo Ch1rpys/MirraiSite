@@ -1,0 +1,35 @@
+---
+/**
+ * `/go/*` 跳转链 —— 零脚本转化统计。
+ * 计数口径：仅安装包（macOS/Windows）与 Docker 按钮；`/en/` 合并计数；跳转链语言无关。
+ * 托管支持 CDN 302 时在托管层配置真 302；此处为退化方案 meta-refresh（零脚本）。
+ */
+import { GO_LINKS, type GoSlug } from '../../consts';
+
+export function getStaticPaths() {
+  return Object.keys(GO_LINKS).map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params as { slug: GoSlug };
+const target = GO_LINKS[slug];
+
+if (!target) {
+  return Astro.redirect('/404');
+}
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>跳转中… · Mirrai</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={target} />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+  </head>
+  <body>
+    <p>
+      <a href={target}>继续前往下载</a>
+    </p>
+  </body>
+</html>

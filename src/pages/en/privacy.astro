@@ -1,0 +1,70 @@
+---
+/**
+ * /en/privacy — standalone privacy page (M2.4)
+ * No analytics scripts / no cookies / /go/* redirect-chain log counting / external uptime checks / localStorage note.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/layout/Header.astro';
+import Footer from '../../components/layout/Footer.astro';
+
+const locale = 'en' as const;
+
+const points = [
+  {
+    title: 'No analytics scripts',
+    body: 'This site does not use any third-party analytics (no Google Analytics, no Umami — nothing of the kind). No user profiles, no behavioral analysis. This matches the product\u2019s stance that data stays local.',
+  },
+  {
+    title: 'No cookies',
+    body: 'This site sets no cookies. No tracking, no tagging, no cross-site linking.',
+  },
+  {
+    title: 'Download counts come only from server access logs',
+    body: 'Download buttons go through the /go/* redirect chain. We only use the host\u2019s server access logs for a rough count of clicks on the installers and Docker — no scripts, no identifiers, no personal data. The count covers only the macOS / Windows installers and the Docker button, and is combined with the English site; source code and other links are direct and not counted.',
+  },
+  {
+    title: 'External uptime checks',
+    body: 'We use a free third-party uptime service (UptimeRobot-style) to monitor whether the site is online. The checks only request the page itself and involve no visitor data.',
+  },
+  {
+    title: 'Your theme preference lives only in your browser',
+    body: 'Your light/dark theme choice is stored in your browser\u2019s localStorage. It is not uploaded, not synced, and not used to identify you. Clear your browser data and it is gone.',
+  },
+  {
+    title: 'The product\u2019s own data',
+    body: "Mirrai's product data (chat logs, personas, memories) is stored on your own machine and has nothing to do with this site. This site is just the doorway — the repo is on GitHub, the data is at home.",
+  },
+];
+---
+
+<Base
+  locale={locale}
+  title="Privacy · Mirrai"
+  description="The Mirrai site has no analytics scripts and no cookies. Download counts come only from server access logs of the /go/* redirect chain. Theme preference is stored in localStorage only."
+>
+  <Header locale={locale} />
+  <main class="mx-auto max-w-3xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
+    <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Privacy</div>
+    <h1 class="mt-4 text-headline text-ink">Nothing here is tracking you.</h1>
+    <p class="mt-6 text-lede text-ink-muted">
+      "Data stays local" is not just a line in the product copy — this site follows it too.
+    </p>
+
+    <div class="mt-12 space-y-8">
+      {
+        points.map((p) => (
+          <div>
+            <h2 class="text-[1.12rem] font-medium text-ink">{p.title}</h2>
+            <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">{p.body}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="mt-14 text-[0.95rem] text-ink-muted">
+      For consent around modeling real people and the boundaries of use, see
+      <a class="link-quiet" href="/en/ethics">Ethics &amp; boundaries →</a>
+    </p>
+  </main>
+  <Footer locale={locale} />
+</Base>
