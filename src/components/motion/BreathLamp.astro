@@ -1,0 +1,46 @@
+---
+/**
+ * M2 呼吸「灯」：暖光 3.4s 呼吸（scale 1→1.12），幅度克制
+ * 用途：加载态 / "TA 在打字"。prefers-reduced-motion 下静止常亮。
+ */
+interface Props {
+  class?: string;
+  size?: number;
+}
+const { class: className = '', size = 10 } = Astro.props;
+---
+
+<span class={`breath-lamp ${className}`} style={`--lamp-size:${size}px`} aria-hidden="true"></span>
+
+<style>
+  .breath-lamp {
+    display: inline-block;
+    width: var(--lamp-size);
+    height: var(--lamp-size);
+    border-radius: 999px;
+    background: radial-gradient(circle at 38% 34%, #ffd9a8, var(--color-lamp) 58%);
+    box-shadow: 0 0 calc(var(--lamp-size) * 1.6) color-mix(in srgb, var(--color-lamp) 55%, transparent);
+    animation: lamp-breath 3.4s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @keyframes lamp-breath {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.88;
+    }
+    50% {
+      transform: scale(1.12);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .breath-lamp {
+      animation: none;
+      transform: none;
+      opacity: 1;
+    }
+  }
+</style>

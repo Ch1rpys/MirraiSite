@@ -1,0 +1,94 @@
+---
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import StructuredData from '../components/layout/StructuredData.astro';
+import { SITE, alternateLinks, type Locale } from '../consts.ts';
+
+interface Props {
+  locale?: Locale;
+  title: string;
+  description: string;
+  /** OG 图路径，默认 /og-default.png（英文站用 /og-default-en.png） */
+  ogImage?: string;
+  /** 不在 head 中输出 canonical / hreflang（404 等） */
+  noindex?: boolean;
+  /** FAQ 结构化数据 */
+  faq?: { q: string; a: string }[];
+}
+
+const {
+  locale = 'zh',
+  title,
+  description,
+  ogImage = locale === 'en' ? '/og-default-en.png' : '/og-default.png',
+  noindex = false,
+  faq = [],
+} = Astro.props;
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const alts = alternateLinks(path);
+const canonical = new URL(alts[locale], SITE.url).toString();
+const ogLocale = locale === 'en' ? 'en_US' : 'zh_CN';
+---
+
+<!doctype html>
+<html lang={locale === 'en' ? 'en' : 'zh-CN'}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="zh-CN" href={new URL(alts.zh, SITE.url).toString()} />
+    <link rel="alternate" hreflang="en" href={new URL(alts.en, SITE.url).toString()} />
+    <link rel="alternate" hreflang="x-default" href={new URL(alts.zh, SITE.url).toString()} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mirrai" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, SITE.url).toString()} />
+    <meta property="og:locale" content={ogLocale} />
+    {
+      locale === 'zh' && (
+        <meta property="og:locale:alternate" content="en_US" />
+      )
+    }
+    {locale === 'en' && <meta property="og:locale:alternate" content="zh_CN" />}
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, SITE.url).toString()} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- 主题防闪烁：localStorage 选择 > prefers-color-scheme > 夜 -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('mirrai-theme');
+          if (stored === 'night' || stored === 'paper') {
+            document.documentElement.setAttribute('data-theme', stored);
+          } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+            document.documentElement.setAttribute('data-theme', 'paper');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'night');
+          }
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'night');
+        }
+      })();
+    </script>
+    <slot name="head" />
+    <StructuredData faq={faq} />
+  </head>
+  <body class="texture-paper min-h-screen antialiased">
+    <slot />
+  </body>
+</html>

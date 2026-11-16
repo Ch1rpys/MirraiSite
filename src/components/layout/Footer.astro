@@ -1,0 +1,87 @@
+---
+import Wordmark from '../logo/Wordmark';
+import { useDict } from '../../i18n';
+import { type Locale, localizedPath, REPO, SITE } from '../../consts';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useDict(locale);
+const isEn = locale === 'en';
+const path = (p: string) => localizedPath(p, locale);
+---
+
+<footer class="border-t border-hairline bg-bg">
+  <div class="mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-16">
+    <div class="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
+      <div class="max-w-sm space-y-4">
+        <Wordmark size={26} className="text-ink" />
+        <p class="text-[0.925rem] leading-relaxed text-ink-muted">{t.footer.about}</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-x-14 gap-y-8 text-[0.925rem] sm:grid-cols-3">
+        <div class="space-y-3">
+          <div class="text-[0.8rem] tracking-[0.14em] text-ink-muted/70">{t.footer.community}</div>
+          <a
+            href={REPO.url}
+            target="_blank"
+            rel="noopener"
+            class="block text-ink transition-colors hover:text-lamp-deep">GitHub</a
+          >
+          <a
+            href={REPO.discussions}
+            target="_blank"
+            rel="noopener"
+            class="block text-ink transition-colors hover:text-lamp-deep">Discussions</a
+          >
+          {
+            isEn ? (
+              <a
+                href={REPO.discussions}
+                target="_blank"
+                rel="noopener"
+                class="block text-ink transition-colors hover:text-lamp-deep"
+              >
+                {t.footer.userGroup}
+              </a>
+            ) : (
+              <span class="block text-ink-muted">{t.footer.userGroup}（微信 / QQ）</span>
+            )
+          }
+        </div>
+
+        <div class="space-y-3">
+          <div class="text-[0.8rem] tracking-[0.14em] text-ink-muted/70">{t.footer.legal}</div>
+          <a href={path('/ethics')} class="block text-ink transition-colors hover:text-lamp-deep">
+            {t.footer.ethics}
+          </a>
+          <a href={path('/privacy')} class="block text-ink transition-colors hover:text-lamp-deep">
+            {t.footer.privacy}
+          </a>
+          <a href={path('/about')} class="block text-ink transition-colors hover:text-lamp-deep">
+            {t.sections.coda.links.handnotes}
+          </a>
+        </div>
+
+        <div class="space-y-3">
+          <div class="text-[0.8rem] tracking-[0.14em] text-ink-muted/70">{t.footer.contact}</div>
+          <a href={`mailto:${SITE.email}`} class="block text-ink transition-colors hover:text-lamp-deep">
+            {t.footer.email}
+          </a>
+          <a href={path('/download')} class="block text-ink transition-colors hover:text-lamp-deep">
+            {t.nav.download}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="mt-12 flex flex-col gap-3 border-t border-hairline pt-6 text-[0.8rem] text-ink-muted/80 md:flex-row md:items-center md:justify-between"
+    >
+      <div>© {new Date().getFullYear()} Mirrai · {t.footer.rights}</div>
+      <div>{t.footer.icp}</div>
+    </div>
+  </div>
+</footer>

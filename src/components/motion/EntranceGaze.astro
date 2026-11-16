@@ -1,0 +1,88 @@
+---
+/**
+ * M1 入场「对望」：左右气泡相向滑入 → 镜面轴落下 → 字标渐开字距浮现
+ * 用途：首屏入场。prefers-reduced-motion 下直接呈现终态。
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`entrance-gaze ${className}`}>
+  <slot />
+</div>
+
+<style>
+  .entrance-gaze {
+    display: contents;
+  }
+
+  .entrance-gaze :global(.gaze-left) {
+    animation: gaze-from-left 0.9s var(--ease-soft) both;
+  }
+
+  .entrance-gaze :global(.gaze-right) {
+    animation: gaze-from-right 0.9s var(--ease-soft) 0.08s both;
+  }
+
+  .entrance-gaze :global(.gaze-axis) {
+    animation: axis-drop 0.7s var(--ease-gentle) 0.55s both;
+  }
+
+  .entrance-gaze :global(.gaze-word) {
+    animation: word-open 1.1s var(--ease-soft) 0.7s both;
+  }
+
+  @keyframes gaze-from-left {
+    from {
+      opacity: 0;
+      transform: translateX(-26px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes gaze-from-right {
+    from {
+      opacity: 0;
+      transform: translateX(26px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes axis-drop {
+    from {
+      opacity: 0;
+      transform: scaleY(0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes word-open {
+    from {
+      opacity: 0;
+      letter-spacing: 0.42em;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .entrance-gaze :global(.gaze-left),
+    .entrance-gaze :global(.gaze-right),
+    .entrance-gaze :global(.gaze-axis),
+    .entrance-gaze :global(.gaze-word) {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,89 @@
+---
+/**
+ * M4 毕业「消隐」：消息痕迹缓缓消隐，浮出一行告别
+ * 用途：毕业仪式过渡、S5 尾声。prefers-reduced-motion 下痕迹静止、告别行直接可见。
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`graduation-fade ${className}`}>
+  <div class="fade-traces" aria-hidden="true">
+    <slot name="traces" />
+  </div>
+  <div class="fade-line">
+    <slot />
+  </div>
+</div>
+
+<script>
+  // 进入视口时触发消隐序列
+  const root = document.querySelector('.graduation-fade');
+  if (root && 'IntersectionObserver' in window) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      root.classList.add('is-faded', 'is-shown');
+    } else {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              root.classList.add('is-faded');
+              window.setTimeout(() => root.classList.add('is-shown'), 1400);
+              io.disconnect();
+            }
+          }
+        },
+        { threshold: 0.45 }
+      );
+      io.observe(root);
+    }
+  } else if (root) {
+    root.classList.add('is-faded', 'is-shown');
+  }
+</script>
+
+<style>
+  .graduation-fade {
+    position: relative;
+  }
+
+  .fade-traces {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+    transition:
+      opacity 1.6s var(--ease-gentle),
+      filter 1.6s var(--ease-gentle),
+      transform 1.6s var(--ease-gentle);
+  }
+
+  .graduation-fade.is-faded .fade-traces {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(-14px);
+  }
+
+  .fade-line {
+    margin-top: 2.4rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 1.2s var(--ease-soft) 0.3s,
+      transform 1.2s var(--ease-soft) 0.3s;
+  }
+
+  .graduation-fade.is-shown .fade-line {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-traces,
+    .fade-line {
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+/**
+ * 主题切换器：默认夜，选择记入 localStorage。零框架 JS。
+ */
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+
+<button
+  type="button"
+  id="theme-toggle"
+  aria-label={label}
+  class="hairline inline-flex h-9 w-9 items-center justify-center rounded-full border text-ink-muted transition-colors hover:text-lamp-deep"
+>
+  <!-- 夜 -->
+  <svg
+    class="icon-night"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.6"
+    aria-hidden="true"
+  >
+    <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11Z"></path>
+  </svg>
+  <!-- 纸 -->
+  <svg
+    class="icon-paper"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.6"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4.2"></circle>
+    <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19"></path>
+  </svg>
+</button>
+
+<script>
+  const btn = document.getElementById('theme-toggle');
+  const sync = () => {
+    if (!btn) return;
+    const paper = document.documentElement.getAttribute('data-theme') === 'paper';
+    btn.setAttribute('aria-pressed', paper ? 'true' : 'false');
+    btn.querySelector<SVGElement>('.icon-night')!.style.display = paper ? 'block' : 'none';
+    btn.querySelector<SVGElement>('.icon-paper')!.style.display = paper ? 'none' : 'block';
+  };
+  btn?.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'night' ? 'paper' : 'night';
+    document.documentElement.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem('mirrai-theme', next);
+    } catch {
+      /* 隐私模式下 localStorage 可能不可用 */
+    }
+    sync();
+  });
+  sync();
+</script>
+
+<style>
+  .icon-paper {
+    display: none;
+  }
+</style>

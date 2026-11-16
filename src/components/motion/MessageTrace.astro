@@ -1,0 +1,101 @@
+---
+/**
+ * M3 消息浮现：抽象消息条依次浮现（不是真实 UI，是"痕迹"）
+ * 用途：首页 S4/S5、demo 节奏。prefers-reduced-motion 下直接可见。
+ */
+interface Props {
+  /** 消息条数量 */
+  count?: number;
+  /** 主题对望：奇数条靠左（空心=不在），偶数条靠右（实心=在） */
+  class?: string;
+}
+const { count = 5, class: className = '' } = Astro.props;
+const bars = Array.from({ length: count }, (_, i) => i);
+---
+
+<div class={`message-traces ${className}`} aria-hidden="true">
+  {
+    bars.map((i) => (
+      <div
+        class:list={['trace', i % 2 === 0 ? 'trace-left' : 'trace-right']}
+        style={`--i:${i}`}
+      >
+        <span class="trace-bar" />
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .message-traces {
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+  }
+
+  .trace {
+    display: flex;
+  }
+
+  .trace-left {
+    justify-content: flex-start;
+  }
+
+  .trace-right {
+    justify-content: flex-end;
+  }
+
+  .trace-bar {
+    display: block;
+    height: 0.72rem;
+    border-radius: 999px;
+    animation: trace-in 0.85s var(--ease-soft) both;
+    animation-delay: calc(var(--i) * 0.22s);
+  }
+
+  .trace-left .trace-bar {
+    width: var(--trace-w, 58%);
+    background: transparent;
+    border: 1.5px solid color-mix(in srgb, var(--color-ink) 34%, transparent);
+  }
+
+  .trace-right .trace-bar {
+    width: var(--trace-w, 42%);
+    background: color-mix(in srgb, var(--color-lamp) 62%, transparent);
+    border: none;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--color-lamp) 28%, transparent);
+  }
+
+  .message-traces :global(.trace:nth-child(1) .trace-bar) {
+    --trace-w: 64%;
+  }
+  .message-traces :global(.trace:nth-child(2) .trace-bar) {
+    --trace-w: 38%;
+  }
+  .message-traces :global(.trace:nth-child(3) .trace-bar) {
+    --trace-w: 52%;
+  }
+  .message-traces :global(.trace:nth-child(4) .trace-bar) {
+    --trace-w: 44%;
+  }
+  .message-traces :global(.trace:nth-child(5) .trace-bar) {
+    --trace-w: 30%;
+  }
+
+  @keyframes trace-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trace-bar {
+      animation: none;
+    }
+  }
+</style>
