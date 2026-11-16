@@ -1,0 +1,42 @@
+---
+import { useDict } from '../../i18n';
+import { type Locale, REPO, USE_GITHUB_RELEASES_CTA } from '../../consts.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const s = t.sections.coda;
+---
+
+<section id="coda" class="relative py-28 md:py-40">
+  <div class="mx-auto max-w-6xl px-5 text-center md:px-8">
+    <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
+    <h2 class="mx-auto mt-6 max-w-3xl text-display text-ink">{s.title}</h2>
+
+    <!-- M1 期只留 GitHub（创作手记 / 博客入口 M2.6 补） -->
+    <div class="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[0.95rem]">
+      <a
+        href={REPO.url}
+        target="_blank"
+        rel="noopener"
+        class="link-quiet"
+      >
+        {s.links.github}
+      </a>
+      {
+        !USE_GITHUB_RELEASES_CTA && (
+          <>
+            <a href={locale === 'en' ? '/en/about' : '/about'} class="link-quiet">
+              {s.links.handnotes}
+            </a>
+            <a href={locale === 'en' ? '/en/blog' : '/blog'} class="link-quiet">
+              {s.links.blog}
+            </a>
+          </>
+        )
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,37 @@
+---
+import PrerecordedDemo from '../demo/PrerecordedDemo.tsx';
+import GraduationFade from '../motion/GraduationFade.astro';
+import MessageTrace from '../motion/MessageTrace.astro';
+import { useDict } from '../../i18n';
+import type { Locale } from '../../consts.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const s = t.sections.graduation;
+---
+
+<section id="graduation" class="relative overflow-hidden py-24 md:py-32">
+  <div class="glow-lamp absolute inset-x-0 top-0 h-1/2 opacity-70" aria-hidden="true"></div>
+
+  <div class="relative mx-auto max-w-6xl px-5 md:px-8">
+    <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
+
+    <h2 class="mt-5 max-w-3xl text-display text-ink">{s.title}</h2>
+
+    <p class="mt-8 border-l-2 border-lamp/60 pl-6 text-lede text-ink-muted">{s.manifesto}</p>
+
+    <div class="mt-14">
+      <PrerecordedDemo client:visible locale={locale} />
+    </div>
+
+    <GraduationFade class="mt-20">
+      <MessageTrace slot="traces" count={4} />
+      <p class="font-display text-[1.45rem] leading-relaxed text-ink md:text-[1.75rem]">
+        {s.fadeLine}
+      </p>
+    </GraduationFade>
+  </div>
+</section>

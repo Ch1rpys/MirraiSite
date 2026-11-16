@@ -1,0 +1,52 @@
+---
+import { useDict } from '../../i18n';
+import type { Locale } from '../../consts.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const s = t.sections.unfinished;
+---
+
+<section id="unfinished" class="relative py-24 md:py-32">
+  <div class="mx-auto max-w-6xl px-5 md:px-8">
+    <div class="max-w-2xl">
+      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
+      <h2 class="mt-4 text-headline text-ink">{s.title}</h2>
+      <p class="mt-6 text-lede text-ink-muted">{s.body}</p>
+    </div>
+
+    <!-- 时间痕迹 -->
+    <div class="mt-14 flex flex-wrap items-end gap-x-12 gap-y-6" aria-hidden="true">
+      <div class="hairline border-l pl-5">
+        <div class="font-display text-3xl text-ink/85">1,284</div>
+        <div class="mt-1 text-[0.75rem] tracking-[0.18em] text-ink-muted">
+          {locale === 'en' ? 'DAYS AGO' : '天前'}
+        </div>
+      </div>
+      <div class="hairline border-l pl-5">
+        <div class="font-display text-3xl text-ink/85">23:47</div>
+        <div class="mt-1 text-[0.75rem] tracking-[0.18em] text-ink-muted">
+          {locale === 'en' ? 'LAST MESSAGE' : '最后一条'}
+        </div>
+      </div>
+      <div class="hairline border-l pl-5">
+        <div class="font-display text-3xl text-ink/85">—</div>
+        <div class="mt-1 text-[0.75rem] tracking-[0.18em] text-ink-muted">
+          {locale === 'en' ? 'ENDING' : '结尾'}
+        </div>
+      </div>
+    </div>
+
+    <figure class="mt-16 max-w-2xl">
+      <blockquote class="border-l-2 border-lamp/60 pl-6 font-display text-[1.35rem] leading-[1.75] text-ink md:text-[1.6rem]">
+        「{s.quote}」
+      </blockquote>
+      <figcaption class="mt-4 pl-6 text-[0.82rem] tracking-[0.14em] text-ink-muted">
+        —— <a class="link-quiet" href={locale === 'en' ? '/en/about' : '/about'}>{s.quoteFrom}</a>
+      </figcaption>
+    </figure>
+  </div>
+</section>

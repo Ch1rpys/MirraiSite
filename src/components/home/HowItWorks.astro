@@ -1,0 +1,44 @@
+---
+import { useDict } from '../../i18n';
+import type { Locale } from '../../consts.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const s = t.sections.how;
+---
+
+<section id="how" class="relative py-24 md:py-32">
+  <div class="mx-auto max-w-6xl px-5 md:px-8">
+    <div class="max-w-2xl">
+      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
+      <h2 class="mt-4 text-headline text-ink">{s.title}</h2>
+    </div>
+
+    <ol class="mt-14 grid gap-10 md:grid-cols-3">
+      {
+        s.steps.map((step) => (
+          <li class="relative">
+            <div class="font-display text-[2.1rem] leading-none text-lamp/85">{step.n}</div>
+            <h3 class="mt-4 text-[1.12rem] font-medium text-ink">{step.title}</h3>
+            <p class="mt-3 text-[0.95rem] leading-[1.9] text-ink-muted">{step.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="mt-14 max-w-2xl border-l-2 border-lamp/60 pl-6 font-display text-[1.3rem] leading-relaxed text-ink">
+      {s.hardline}
+    </p>
+
+    <!-- 截图占位：槽位 P3/P4/P2（M2 摆拍后替换） -->
+    <div
+      class="hairline mt-12 flex min-h-[16rem] items-center justify-center rounded-2xl border border-dashed text-[0.85rem] tracking-[0.14em] text-ink-muted/70"
+      data-shot-slot="P3-P4-P2"
+    >
+      {s.shotSlot}
+    </div>
+  </div>
+</section>

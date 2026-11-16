@@ -1,0 +1,57 @@
+---
+import { useDict } from '../../i18n';
+import type { Locale } from '../../consts.ts';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const s = t.sections.fidelity;
+---
+
+<section id="fidelity" class="relative py-24 md:py-32">
+  <div class="mx-auto max-w-6xl px-5 md:px-8">
+    <div class="max-w-2xl">
+      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
+      <h2 class="mt-4 text-headline text-ink">{s.title}</h2>
+    </div>
+
+    <!-- 判别规则图：触发词 → 含义 → 表现 -->
+    <div class="mt-12">
+      <div class="text-[0.8rem] tracking-[0.18em] text-ink-muted">{s.ruleTitle}</div>
+      <div class="mt-5 flex flex-wrap items-stretch gap-3">
+        {
+          s.ruleChain.map((node, i) => (
+            <>
+              {i > 0 && (
+                <span class="flex items-center text-lamp/70" aria-hidden="true">
+                  →
+                </span>
+              )}
+              <div class="hairline min-w-[7.5rem] flex-1 rounded-xl border bg-surface/60 px-5 py-4 text-center text-[0.95rem] text-ink">
+                {node}
+              </div>
+            </>
+          ))
+        }
+      </div>
+      <p class="mt-5 text-[0.95rem] leading-[1.9] text-ink-muted">{s.ruleExample}</p>
+    </div>
+
+    <!-- 保真之尺 -->
+    <div class="mt-12">
+      <div class="text-[0.8rem] tracking-[0.18em] text-ink-muted">{s.scaleTitle}</div>
+      <ul class="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+        {
+          s.scaleItems.map((item) => (
+            <li class="hairline rounded-xl border px-4 py-4 text-center text-[0.92rem] text-ink">
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-5 text-[0.95rem] text-ink-muted">{s.local}</p>
+    </div>
+  </div>
+</section>
