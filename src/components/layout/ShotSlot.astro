@@ -1,24 +1,34 @@
 ---
 /**
- * 截图槽位（P1–P8，见 EXECUTION.md §4.1 映射表）。
- * 摆拍成品按命名规范丢进 public/shots/ 后重新构建即自动上页；
- * 未就位时渲染占位卡（虚线 + 编号 + 场景说明），不会破版。
+ * 截图槽位（P1–P8，见 EXECUTION.md §4.1 映射表），呈现为一张拍立得。
+ * 摆拍成品按命名规范丢进 public/shots/ 后重新构建即自动显影；
+ * 未就位时是「还没显影」的相纸。
  * 文件规范：2x PNG，命名 shot-pNN-slug@2x.png；演示数据、无真实隐私。
  */
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { useDict } from '../../i18n';
+import type { Locale } from '../../consts';
 
 interface Props {
   /** P1 – P8 */
   id: 'P1' | 'P2' | 'P3' | 'P4' | 'P5' | 'P6' | 'P7' | 'P8';
-  /** 场景说明（与摆拍清单一致） */
+  /** 场景说明（与摆拍清单一致），作 alt 与默认题字 */
   scene: string;
+  /** 相纸下沿的题字，缺省用 scene */
+  caption?: string;
+  locale?: Locale;
+  /** 倾斜角度（deg） */
+  tilt?: number;
+  /** 顶上贴一段胶带 */
+  tape?: boolean;
   class?: string;
 }
 
-const { id, scene, class: className = '' } = Astro.props;
+const { id, scene, caption, locale = 'zh', tilt = 0, tape = false, class: className = '' } = Astro.props;
+const t = useDict(locale);
 
-const slug: Record<string, string> = {
+const slug: Record<Props['id'], string> = {
   P1: 'shot-p01-lobby@2x.png',
   P2: 'shot-p02-chat@2x.png',
   P3: 'shot-p03-upload@2x.png',
@@ -33,27 +43,91 @@ const file = `/shots/${slug[id]}`;
 const ready = existsSync(join(process.cwd(), 'public', 'shots', slug[id]));
 ---
 
-{
-  ready ? (
-    <figure class={`shot-slot ${className}`}>
-      <img src={file} alt={scene} loading="lazy" decoding="async" class="w-full rounded-2xl" />
-      <figcaption class="mt-2 text-[0.75rem] tracking-[0.12em] text-ink-muted/70">
-        {id} · {scene}
-      </figcaption>
-    </figure>
-  ) : (
-    <figure
-      class={`hairline shot-slot flex min-h-[12rem] items-center justify-center rounded-2xl border border-dashed px-6 py-10 text-center ${className}`}
-      data-shot-slot={id}
-    >
-      <figcaption class="text-[0.85rem] leading-relaxed tracking-[0.12em] text-ink-muted/70">
-        <span class="font-display text-[1.25rem] text-ink-muted">{id}</span>
-        <span class="mx-2 text-ink-muted/50">·</span>
-        {scene}
-        <span class="mt-1.5 block text-[0.75rem] text-ink-muted/50">
-          待摆拍 · public/shots/{slug[id]}
-        </span>
-      </figcaption>
-    </figure>
-  )
-}
+<figure
+  class:list={['polaroid-wrap paper-lift', className]}
+  style={`--tilt:${tilt}deg`}
+  data-shot-slot={ready ? undefined : id}
+>
+  {tape && <span class="tape polaroid-tape" aria-hidden="true" />}
+  <div class="paper paper-white polaroid">
+    <div class="polaroid-photo">
+      {
+        ready ? (
+          <img src={file} alt={scene} loading="lazy" decoding="async" />
+        ) : (
+          <span class="polaroid-undeveloped" role="img" aria-label={`${scene} · ${t.shots.undeveloped}`} />
+        )
+      }
+    </div>
+    <figcaption class="polaroid-caption">
+      <span class="ink-hand block">{caption ?? scene}</span>
+      {!ready && <span class="mt-1 block text-[0.68rem] tracking-[0.18em] ink-pencil">{t.shots.undeveloped} · {id}</span>}
+    </figcaption>
+  </div>
+</figure>
+
+<style>
+  .polaroid-wrap {
+    position: relative;
+    transform: rotate(var(--tilt));
+  }
+
+  .polaroid {
+    padding: 5.5% 5.5% 0;
+  }
+
+  .polaroid-photo {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #1d1c1a;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+  }
+
+  .polaroid-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  /* 显影前的相纸：偏冷的暗灰，药膜有一点不均匀的光泽 */
+  .polaroid-undeveloped {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60% 50% at 28% 22%, rgba(150, 140, 122, 0.22), transparent 70%),
+      radial-gradient(70% 60% at 80% 85%, rgba(70, 82, 96, 0.28), transparent 70%),
+      linear-gradient(160deg, #2c2b29 0%, #1b1a19 58%, #24221f 100%);
+    animation: polaroid-develop 7s ease-in-out infinite alternate;
+  }
+
+  .polaroid-caption {
+    padding: 0.85em 0.2em 1.15em;
+    min-height: 22%;
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .polaroid-tape {
+    top: -0.7rem;
+    left: 50%;
+    translate: -50% 0;
+    rotate: -3deg;
+  }
+
+  @keyframes polaroid-develop {
+    from {
+      filter: brightness(0.92);
+    }
+    to {
+      filter: brightness(1.12);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .polaroid-undeveloped {
+      animation: none;
+    }
+  }
+</style>

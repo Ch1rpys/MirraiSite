@@ -1,7 +1,14 @@
 ---
+/**
+ * 第一幕 · Hero：镜头落定的那一帧——书桌近景（灯 + 信）。照片与进门镜头出自同一个三维场景、同一个机位。
+ * 房间永远是夜：本节固定 data-theme="night"，不随主题切换。
+ */
+import deskClose from '../../assets/room/desk-close.jpg';
+import deskCloseP from '../../assets/room/desk-close-p.jpg';
+import ScenePicture from '../room/ScenePicture.astro';
+import { coverVars, letterVars } from '../room/scene';
 import Lockup from '../logo/Lockup.tsx';
 import EntranceGaze from '../motion/EntranceGaze.astro';
-import MessageTrace from '../motion/MessageTrace.astro';
 import { useDict } from '../../i18n';
 import { type Locale, REPO, USE_GITHUB_RELEASES_CTA } from '../../consts.ts';
 
@@ -11,42 +18,55 @@ interface Props {
 const { locale } = Astro.props;
 const t = useDict(locale);
 const trustItems = t.site.trust.split(' · ');
+const downloadHref = USE_GITHUB_RELEASES_CTA ? REPO.releases : locale === 'en' ? '/en/download' : '/download';
 ---
 
-<section id="hero" class="relative overflow-hidden" aria-label="Hero">
-  <div class="glow-lamp absolute inset-0" aria-hidden="true"></div>
-  <div class="absolute right-[-6%] top-1/2 hidden w-[26rem] -translate-y-1/2 opacity-[0.16] lg:block" aria-hidden="true">
-    <MessageTrace count={5} />
+<section id="hero" class="hero" data-theme="night" data-night-stage="0.24" aria-label="Hero">
+  <div class="scene room-scene" aria-hidden="true">
+    <div class="scene-cover" style={coverVars('close')}>
+      <ScenePicture l={deskClose} p={deskCloseP} eager />
+      <span class="scene-lamp"></span>
+    </div>
+    <div class="hero-shade"></div>
+    <div class="scene-grain"></div>
   </div>
 
-  <div class="relative mx-auto flex min-h-[86vh] max-w-6xl flex-col justify-center px-5 pb-20 pt-16 md:px-8 md:pb-28 md:pt-24">
+  <div class="hero-copy relative mx-auto flex h-full max-w-6xl flex-col px-5 md:px-8" style={letterVars('close')}>
     <EntranceGaze>
-      <Lockup variant="horizontal" symbolSize={104} wordmarkSize={38} className="gaze-word mb-10 text-ink" />
+      <Lockup
+        variant="horizontal"
+        symbolSize={84}
+        wordmarkSize={32}
+        className="gaze-word mb-8 text-ink max-md:hidden"
+      />
     </EntranceGaze>
 
-    <h1 class="max-w-4xl whitespace-pre-line text-display text-ink">
+    <h1 class="hero-reveal max-w-[13em] whitespace-pre-line text-display text-ink" style="--i:1">
       {t.hero.title}
     </h1>
 
-    <p class="mt-7 max-w-2xl text-lede text-ink-muted">{t.hero.subtitle}</p>
+    <p class="hero-reveal hero-sub mt-6 max-w-[34rem] text-lede text-ink-muted" style="--i:2">{t.hero.subtitle}</p>
 
-    <div class="mt-10 flex flex-wrap items-center gap-4">
+    <div class="hero-reveal hero-cta mt-9 flex flex-wrap items-center gap-4" style="--i:3">
       <a
-        href={USE_GITHUB_RELEASES_CTA ? REPO.releases : '/download'}
-        class="rounded-full bg-lamp px-7 py-3.5 text-[0.95rem] font-medium text-bg transition-opacity hover:opacity-88"
+        href={downloadHref}
+        class="rounded-full bg-lamp px-7 py-3.5 text-[0.95rem] font-medium text-bg shadow-[0_0_40px_rgba(228,168,104,0.25)] transition-opacity hover:opacity-90"
       >
         {t.hero.ctaPrimary}
       </a>
       <a
         href="#how"
-        class="hairline rounded-full border px-7 py-3.5 text-[0.95rem] text-ink transition-colors hover:border-lamp-deep hover:text-lamp-deep"
+        class="rounded-full border border-ink/25 px-7 py-3.5 text-[0.95rem] text-ink backdrop-blur-[2px] transition-colors hover:border-lamp hover:text-lamp"
       >
         {t.hero.ctaSecondary}
       </a>
-      <span class="w-full text-[0.78rem] text-ink-muted/80 sm:w-auto">{t.hero.boundary}</span>
+      <span class="w-full text-[0.78rem] text-ink-muted/85 sm:w-auto">{t.hero.boundary}</span>
     </div>
 
-    <div class="mt-14 flex flex-wrap gap-x-6 gap-y-2 text-[0.8rem] tracking-[0.12em] text-ink-muted">
+    <div
+      class="hero-reveal mt-10 flex flex-wrap gap-x-6 gap-y-2 text-[0.8rem] tracking-[0.12em] text-ink-muted"
+      style="--i:4"
+    >
       {
         trustItems.map((item) => (
           <span class="inline-flex items-center gap-2">
@@ -58,3 +78,70 @@ const trustItems = t.site.trust.split(' · ');
     </div>
   </div>
 </section>
+
+<style>
+  .hero {
+    position: relative;
+    z-index: 1;
+    height: 100svh;
+    min-height: 36rem;
+    overflow: hidden;
+    background: #0b0a09;
+    /* 下沿融进书桌 */
+    mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  }
+
+  .hero-shade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(11, 9, 8, 0.88) 0%, rgba(11, 9, 8, 0.6) 34%, rgba(11, 9, 8, 0) 62%),
+      linear-gradient(to bottom, rgba(11, 9, 8, 0.45) 0%, transparent 22%);
+  }
+
+  .hero-copy {
+    justify-content: center;
+    padding-top: 6rem;
+    padding-bottom: 7rem;
+  }
+
+  /* 横屏：文字不压到信纸上。信纸左缘在照片里的位置是定的（scene.json 的 letterBox），
+     照片盒子怎么铺满首屏，这里照 desk.css 的 .scene-cover 再算一遍，得到信纸左缘在视口里的位置；
+     副标题和按钮那一行的右缘都停在它前面（按钮行放不下时，旁边那句小字自己折到下一行）。 */
+  @media not all and (max-aspect-ratio: 1/1) {
+    .hero-copy {
+      --scene-h: max(100svh, 36rem);
+      --bw: max(100vw, calc(var(--scene-h) * var(--ar) * var(--zoom)));
+      --box-left: clamp(calc(100vw - var(--bw)), calc(50vw - var(--fx) * var(--bw)), 0px);
+      --copy-left: calc(max(0px, (100vw - 72rem) / 2) + 2rem);
+      --clear: calc(var(--box-left) + var(--letter-x0) * var(--bw) - var(--copy-left));
+    }
+
+    .hero-sub {
+      max-width: min(34rem, calc(var(--clear) - 2rem));
+    }
+
+    .hero-cta {
+      max-width: calc(var(--clear) - 1rem);
+    }
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    .hero-shade {
+      background: linear-gradient(
+        to bottom,
+        rgba(11, 9, 8, 0.5) 0%,
+        rgba(11, 9, 8, 0) 18%,
+        rgba(11, 9, 8, 0) 34%,
+        rgba(11, 9, 8, 0.82) 58%,
+        rgba(11, 9, 8, 0.94) 100%
+      );
+    }
+
+    .hero-copy {
+      justify-content: flex-end;
+      padding-bottom: 5.5rem;
+    }
+  }
+</style>

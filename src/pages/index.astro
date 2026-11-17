@@ -2,33 +2,37 @@
 import Base from '../layouts/Base.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import RoomIntro from '../components/room/RoomIntro.astro';
+import Desk from '../components/room/Desk.astro';
 import Hero from '../components/home/Hero.astro';
 import Unfinished from '../components/home/Unfinished.astro';
 import HowItWorks from '../components/home/HowItWorks.astro';
 import WhenAbsent from '../components/home/WhenAbsent.astro';
-import Graduation from '../components/home/Graduation.astro';
 import Fidelity from '../components/home/Fidelity.astro';
-import Trust from '../components/home/Trust.astro';
-import DownloadSection from '../components/home/Download.astro';
-import Coda from '../components/home/Coda.astro';
+import Graduation from '../components/home/Graduation.astro';
+import Finale from '../components/home/Finale.astro';
 import { useDict } from '../i18n';
 
 const locale = 'zh' as const;
 const t = useDict(locale);
 ---
 
-<Base locale={locale} title={`Mirrai · ${t.site.tagline}`} description={t.site.description}>
-  <Header locale={locale} />
+<Base locale={locale} title={`Mirrai · ${t.site.tagline}`} description={t.site.description} intro>
+  <RoomIntro locale={locale} />
+  <Header locale={locale} overlay />
   <main>
+    <!-- 第一幕 · 入室 -->
     <Hero locale={locale} />
-    <Unfinished locale={locale} />
-    <HowItWorks locale={locale} />
-    <WhenAbsent locale={locale} />
-    <Graduation locale={locale} />
-    <Fidelity locale={locale} />
-    <Trust locale={locale} />
-    <DownloadSection locale={locale} />
-    <Coda locale={locale} />
+    <Desk class="-mt-[22svh]" tail>
+      <Unfinished locale={locale} />
+      <!-- 第二幕 · 桌上摊开的几样东西 -->
+      <HowItWorks locale={locale} />
+      <WhenAbsent locale={locale} />
+      <Fidelity locale={locale} />
+      <Graduation locale={locale} />
+    </Desk>
+    <!-- 第三幕 · 掩卷 -->
+    <Finale locale={locale} />
   </main>
-  <Footer locale={locale} />
+  <Footer locale={locale} edge />
 </Base>

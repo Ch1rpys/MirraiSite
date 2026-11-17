@@ -2,6 +2,7 @@
 import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
+import '../styles/desk.css';
 import StructuredData from '../components/layout/StructuredData.astro';
 import { SITE, alternateLinks, type Locale } from '../consts.ts';
 
@@ -15,6 +16,8 @@ interface Props {
   noindex?: boolean;
   /** FAQ 结构化数据 */
   faq?: { q: string; a: string }[];
+  /** 首页进门镜头（RoomIntro）：每次访问都播，可跳过 */
+  intro?: boolean;
 }
 
 const {
@@ -24,6 +27,7 @@ const {
   ogImage = locale === 'en' ? '/og-default-en.png' : '/og-default.png',
   noindex = false,
   faq = [],
+  intro = false,
 } = Astro.props;
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -90,6 +94,116 @@ const ogLocale = locale === 'en' ? 'en_US' : 'zh_CN';
         }
       })();
     </script>
+    {
+      intro && (
+        <script is:inline data-dev={import.meta.env.DEV ? '1' : undefined}>
+          (function () {
+            var d = document.documentElement;
+            var me = document.currentScript;
+            try {
+              if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || location.hash) return;
+            } catch (e) {
+              return;
+            }
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            var short = window.innerWidth < 768;
+            // 进门镜头的时间轴（秒）。hold：进门先停一拍；wait：最多等三维层这么久，等不到就走 2.5D 推镜；
+            // 其余都从「开拍」起算——push：2.5D 推镜时长；move：三维镜头时长；out：溶进首屏；copy：文字浮现
+            var T = short
+              ? { hold: 0.25, wait: 1.1, push: 2.2, move: 1.8, out: 1.55, outDur: 0.7, copy: 1.85 }
+              : { hold: 0.45, wait: 1.5, push: 3.45, move: 2.85, out: 2.55, outDur: 0.9, copy: 3.0 };
+            // 调镜头用（仅开发服务器）：?intro=slow 把整条时间轴放慢 40 倍
+            if (me && me.dataset.dev && /[?&]intro=slow/.test(location.search)) {
+              for (var k in T) if (k !== 'hold') T[k] *= 40;
+            }
+            d.style.setProperty('--intro-push-dur', T.push + 's');
+            d.style.setProperty('--intro-out-at', T.out + 's');
+            d.style.setProperty('--intro-out-dur', T.outDur + 's');
+            d.style.setProperty('--intro-copy-at', T.copy + 's');
+            d.classList.add('intro-run', 'intro-hold');
+            if (short) d.classList.add('intro-short');
+
+            // 省流量模式或 2G 直接不下三维层；其余网速交给 wait 这个期限去裁决
+            var conn = navigator.connection;
+            var slow = conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ''));
+            var t0 = performance.now();
+            var state = 'hold'; // hold（停一拍 / 等三维层）→ run → done
+            var starter = null;
+
+            function done() {
+              if (state === 'done') return;
+              state = 'done';
+              d.classList.remove('intro-hold');
+              d.classList.add('intro-done');
+              ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+                window.removeEventListener(t, skip, true);
+              });
+            }
+            function go(mode) {
+              if (state !== 'hold') return;
+              state = 'run';
+              I.mode = mode;
+              d.classList.remove('intro-hold');
+              if (mode === '3d') {
+                d.classList.add('intro-3d');
+                if (starter) starter();
+              }
+              window.setTimeout(done, (T.out + T.outDur) * 1000 + 80);
+            }
+            function afterHold(fn) {
+              window.setTimeout(fn, Math.max(0, T.hold * 1000 - (performance.now() - t0)));
+            }
+            function skip(e) {
+              if (state === 'done' || d.classList.contains('intro-skip')) return;
+              if (e && e.type === 'keydown' && (e.metaKey || e.ctrlKey || e.altKey)) return;
+              if (state === 'hold') {
+                state = 'run';
+                d.classList.remove('intro-hold');
+              }
+              d.classList.add('intro-skip');
+              window.setTimeout(done, 480);
+            }
+            // 三维层（components/room/room3d.ts）通过它接进时间轴：就绪了调 ready，不行就调 fail
+            var I = (window.__intro = {
+              T: T,
+              mode: '2d',
+              want3d: !!window.WebGL2RenderingContext && !slow,
+              ready: function (start) {
+                if (state !== 'hold') return false;
+                starter = start;
+                afterHold(function () {
+                  go('3d');
+                });
+                return true;
+              },
+              fail: function () {
+                if (!I.want3d) return;
+                I.want3d = false;
+                afterHold(function () {
+                  go('2d');
+                });
+              },
+            });
+            if (!I.want3d) {
+              afterHold(function () {
+                go('2d');
+              });
+            }
+            window.setTimeout(function () {
+              go('2d');
+            }, T.wait * 1000);
+
+            ['wheel', 'touchstart', 'keydown'].forEach(function (t) {
+              window.addEventListener(t, skip, { capture: true, passive: true });
+            });
+            document.addEventListener('click', function (e) {
+              var el = e.target;
+              if (el && el.closest && el.closest('.room-intro')) skip(e);
+            });
+          })();
+        </script>
+      )
+    }
     <slot name="head" />
     <StructuredData faq={faq} />
   </head>

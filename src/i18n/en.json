@@ -28,7 +28,12 @@
       "title": "Some things were left unsaid.",
       "body": "Late at night you replay a conversation and notice it ended in blank space. Not because there was nothing left to say — because it never got said. You can hand those records to Mirrai. It doesn't bring anyone back; it simply finishes what was left unfinished.",
       "quote": "You can ask a program this question, but you couldn't ask it to the real person who loved me.",
-      "quoteFrom": "Creator's notes"
+      "quoteFrom": "Creator's notes",
+      "letter": {
+        "date": "1,284 days ago · 23:47",
+        "ending": "What I always meant to tell you was —",
+        "endingLabel": "unfinished"
+      }
     },
     "how": {
       "kicker": "How it works",
@@ -80,8 +85,7 @@
       "title": "It isn't designed to keep you. It's designed to let you go.",
       "manifesto": "The product's success metric isn't retention. It's graduation.",
       "demoHint": "Conversation → visible memory recall → farewell letter",
-      "demoPlaceholder": "Pre-recorded conversation playback (real version ships in M2)",
-      "fadeLine": "One day you won't need it anymore — that's when it's done."
+      "demoPlaceholder": "Pre-recorded conversation playback (real version ships in M2)"
     },
     "fidelity": {
       "kicker": "How true is it",
@@ -131,7 +135,7 @@
     },
     "coda": {
       "kicker": "Coda",
-      "title": "One day you won't need it anymore — that's when it's done.",
+      "title": "One day you won't need it anymore —\nthat's when it's done.",
       "links": {
         "github": "GitHub",
         "handnotes": "Creator's notes",
@@ -150,6 +154,12 @@
     "userGroup": "Community",
     "rights": "Code MIT · Content CC BY-NC-SA 4.0",
     "icp": "ICP filing (pending)"
+  },
+  "intro": {
+    "skip": "Skip"
+  },
+  "shots": {
+    "undeveloped": "Not developed yet"
   },
   "motion": {
     "typing": "typing",

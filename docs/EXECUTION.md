@@ -1,6 +1,6 @@
 # Mirrai 官网 · 执行书
 
-> 版本 v1.3 · 配合《项目计划书》使用（修订记录见文末）
+> 版本 v1.4 · 配合《项目计划书》《设计精进定案》使用（修订记录见文末）
 > 原则：每个任务有明确的完成定义（DoD）；每个资产有明确的负责人；没有"以后再说"的悬空项
 
 ---
@@ -11,6 +11,7 @@
 |---|---|---|
 | 工程搭建、页面开发、动效实现 | AI（MiMoCode） | Astro 工程、组件、i18n、构建 |
 | 抽象视觉素材（纹理/图形/动效） | AI | SVG/CSS 代码生成 |
+| 房间三维场景（建模 / 静帧 / 烘焙） | AI | `scripts/room/build.py`；重渲需本机 Blender 5.x（可用环境变量 `BLENDER`） |
 | 文案起草 | AI 起草 → 用户定稿 | 中文先写，英文由 AI 译、用户审 |
 | logo / 规范 | AI 出稿 → 用户拍板 | ✅ 已定稿 V3 空与在 |
 | 产品截图摆拍 | **用户** | 按 §4 摆拍清单在本地产品截 |
@@ -30,20 +31,30 @@
 ```
 MirraiSite/
 ├── docs/
-│   ├── PROJECT-PLAN.md          # 计划书（已就绪）
-│   └── EXECUTION.md             # 本执行书（已就绪）
+│   ├── PROJECT-PLAN.md          # 计划书
+│   ├── EXECUTION.md             # 本执行书
+│   ├── DESIGN-REFINEMENT.md     # 三幕 + 房间定案（含生产管线）
+│   ├── RECORDING-SCRIPT.md      # 录屏脚本（用户据此录）
+│   └── SHA256SUMS-CI-PATCH.md   # 产品仓库 CI 补丁（待合并）
+├── assets/room/
+│   ├── room.blend               # 房间场景源文件（由 scripts/room/build.py 生成）
+│   └── photo-v1/                # 上一版 AI 照片（不参与构建，对比/回退用）
 ├── public/
 │   ├── favicon.svg / favicon-32.png / favicon-16.png
 │   ├── og-default.png           # 1200×630
-│   └── fonts/                   # Cormorant / Playfair / EB Garamond（自托管）
+│   └── fonts/                   # Cormorant / Playfair / EB Garamond / Noto（自托管）
 ├── src/
+│   ├── assets/
+│   │   ├── room/                # 静帧 jpg + scene.json（机位 / 裁切 / 推镜）
+│   │   └── room3d/              # 进门三维层：room.bin + atlas-*.webp
 │   ├── components/
 │   │   ├── logo/                # Logo.tsx（V3 符号）、Wordmark.tsx
 │   │   ├── home/                # Hero, Unfinished, HowItWorks, WhenAbsent,
-│   │   │                        # Graduation, Fidelity, Trust, Download, Coda
+│   │   │                        # Graduation, Fidelity, Finale
+│   │   ├── room/                # RoomIntro, Desk, DeskSheet, ScenePicture
 │   │   ├── demo/                # PrerecordedDemo.tsx（预录对话回放）
 │   │   ├── motion/              # M1–M4 动效组件（含 reduced-motion 降级）
-│   │   └── layout/              # Header, Footer, ThemeToggle, LangSwitch
+│   │   └── layout/              # Header, Footer, ThemeToggle, LangSwitch, ShotSlot
 │   ├── content/                 # MDX 内容（Git-based CMS 管理）
 │   │   ├── blog/                # 版本博客
 │   │   ├── docs/                # 文档站（zh）
@@ -61,11 +72,15 @@ MirraiSite/
 │   │   └── en/                  # 以上全部的英文镜像
 │   └── styles/
 │       ├── tokens.css           # 双主题色板 / 字体 / 间距
-│       └── base.css
+│       ├── base.css
+│       └── desk.css             # 桌面、灯、进门层
 ├── scripts/
-│   └── fetch-releases.mjs       # 拉取 GitHub Releases（下载页数据）
+│   ├── fetch-releases.mjs       # 拉取 GitHub Releases（下载页数据）
+│   ├── build-fonts.mjs          # 中英文字体子集化
+│   ├── link-check.mjs           # 内链扫描
+│   └── room/                    # 房间一条龙：build.py / run.mjs / pack-atlases / fetch-textures
 ├── LICENSE                      # MIT（代码）
-├── LICENSE-CONTENT.md           # CC BY-NC-SA 4.0（内容：文案/手记/图片）
+├── LICENSE-CONTENT.md           # CC BY-NC-SA 4.0（内容：文案/手记/图片；含 Poly Haven CC0 贴图清单）
 ├── astro.config.mjs
 └── package.json
 ```
@@ -197,6 +212,45 @@ MirraiSite/
 
 ---
 
+### M4 · 设计精进（三幕 + 房间）
+
+定案见 `docs/DESIGN-REFINEMENT.md`。九屏信息、中英文案、伦理口径不变；改的是世界、节奏、高潮、物件感。
+
+**M4.1 三幕骨架**
+- [x] 首页改为三幕：入室（Hero + 未竟之言）→ 桌上物件（S3–S6）→ 掩卷（Finale 收 S7–S9）
+- [x] `Trust` / `Download` / `Coda` 三个独立屏合并为 `Finale.astro`（灯亮信任 → 信封下载 → 灯灭尾句）
+- [x] 尾句全站只出现一次（从毕业屏拿掉）
+- [x] Header 进门时可叠在镜头上（`overlay`）；页脚在灯灭之后以桌沿出现（`edge`）
+
+**M4.2 第二幕物件化**
+- [x] S3 三张拍立得（截图未就位时「还没显影」，P1 只留 `/about`）
+- [x] S4 四张纸条 / 小物，不是 2×2 卡片
+- [x] S6 便条 + 保真之尺，不是流程砖块
+- [x] S5 demo 做在纸条上；控件在纸条下沿，不做播放器皮肤
+- [x] 第二幕铺在同一张桌面上（夜 / 纸两套桌面静帧）
+
+**M4.3 进门镜头**
+- [x] 每次进首页都播，1 秒内可跳过；跳过揭开的是已在 DOM 里的正文
+- [x] 带 hash / `prefers-reduced-motion` 不播；无 JS 时整层不出现
+- [x] WebGL2 三维层（手写 renderer，无三维库）；不支持 / 省流量 / 加载失败 / 超时则回退 2.5D 推镜
+- [x] 横竖各一对机位；落点与 Hero 静帧同一机位
+- [x] 镜头结束或跳过后立刻释放 WebGL 上下文
+- [x] 首屏文字按 `scene.json` 的 `letterBox` 让开信纸
+
+**M4.4 软页换纸 / 工具页出戏**
+- [x] `/about` `/ethics` `/privacy` `/blog`（及英文镜像）用 `DeskSheet`：同一桌前换纸
+- [x] `/docs/*` `/download` 保持工具页，不进房间、不播镜头
+
+**M4.5 房间生产管线**
+- [x] Blender 脚本从零搭房 → `assets/room/room.blend`
+- [x] 静帧进 `src/assets/room/`，三维层进 `src/assets/room3d/`，机位与裁切进 `scene.json`
+- [x] Poly Haven CC0 贴图下载到 `.cache/` 不入库；清单见 `LICENSE-CONTENT.md`
+- [x] `npm run room` 一条龙（命令与注意见定案 §11）
+
+**M4 DoD**：滚一遍能感到「前段桌前 → 中段换物件 → 毕业后收」；能从页上指出拍立得、纸条、信封、灯；进门 1 秒内可跳过，跳过后主 CTA 可点；reduced-motion 下无推镜头；about 与 docs 不应长得像同一套分栏。
+
+---
+
 ## 3. 上线清单（Launch Checklist）
 
 **域名与备案**
@@ -244,7 +298,7 @@ MirraiSite/
 
 | # | 场景 | 构图要求 | 用在哪 |
 |---|---|---|---|
-| P1 | 大厅（多分身） | 2–3 个分身卡，含亲密度、上次联系天数、状态标签 | 首页 S3 / `/about` |
+| P1 | 大厅（多分身） | 2–3 个分身卡，含亲密度、上次联系天数、状态标签 | `/about`（首页拍立得最多三张，P1 不进首页） |
 | P2 | 对话界面 | 一段有情绪起伏的对话；底部可见情感状态标签；一条"记忆召回"可见行 | 首页 S3 / S5 |
 | P3 | 上传素材页 | 拖拽区 + 蒸馏模式选择（快速/标准/深度/同事/名人研究） | 首页 S3 三步之 1 |
 | P4 | 蒸馏进度 | pipeline 阶段推进中的界面 | 首页 S3 三步之 2 |
@@ -263,6 +317,7 @@ MirraiSite/
 - 暖光晕（radial-gradient + blur）
 - 消息痕迹抽象图形（M3 动效组件）
 - 时间痕迹元素（日期、天数、时区的排版组件）
+- 房间静帧与进门三维层：Blender 场景，见 §4.5 / 定案 §11（不再用 AI 生成房间照片当主视觉）
 
 ### 4.4 交互式 demo 脚本（预录对话回放）
 
@@ -271,6 +326,21 @@ MirraiSite/
 - 交互：点击"下一条"或自动播放，可暂停；零后端
 - 语气必须与产品真实输出风格一致（克制、有不完美感）
 - 界面标注「演示数据」；**交付在 M2**（M1 仅占位）；英文站呈现方式（英文台词或中字）随 M2 定
+
+### 4.5 房间场景
+
+房间只有一个源头：`scripts/room/build.py`（Blender Python，从零搭出整间房）→ `assets/room/room.blend`。贴图来自 Poly Haven（CC0），构建时下载到 `.cache/`，不入库。
+
+```
+npm run room                 # 全部重做：静帧 + 烘焙 + 压图集
+npm run room -- preview      # 只出小样到 .cache/room/preview-*.jpg
+npm run room -- stills       # 只重渲静帧 → src/assets/room/*.jpg
+npm run room -- bake         # 只重烘实时三维层 → src/assets/room3d/
+npm run room -- bake --from-blend   # 不重建，直接用 room.blend
+npm run room -- json         # 只重写 scene.json
+```
+
+需要本机 Blender（5.1 上验证过；非默认位置用环境变量 `BLENDER`）。构图、机位、采样、图集尺寸等注意见 `docs/DESIGN-REFINEMENT.md` §11。上一版 AI 照片留在 `assets/room/photo-v1/`，不参与构建。
 
 ---
 
@@ -309,6 +379,7 @@ MirraiSite/
 □ 内链 404 扫描
 □ `/go/*` 跳转与日志抽查（口径：安装包+Docker）
 □ 伦理五条 + 边界句存在性检查（人工）
+□ 三幕节奏 + 进门可跳过 + reduced-motion 静帧（M4，定案 §10）
 ```
 
 ---
@@ -335,3 +406,4 @@ MirraiSite/
 | v1.1 | 三轮自审修正：动效 M2 入 WBS、预览部署流程、`/privacy` 与零统计脚本、截图 P1–P8 与槽位映射、demo 归 M2、双许可文件、Keystatic Cloud mode、录屏脚本入 WBS、下载计数口径（安装包+Docker）、告警邮箱、localStorage 隐私声明、回归补 `/go/*` 抽查等 |
 | v1.2 | 四轮自审修正：M1 零死链（锚点导航 + CTA 临时指 GitHub Releases，M2.6 加切换任务）、Docker 计数落地（`/go/docker`）、SHA 仅安装包、域名解析两阶段表述、字体 OFL 声明、M1 引文孤引说明 |
 | v1.3 | 五轮自审修正：M1 零死链补全屏内链接（S7/S8/S9 降级策略），M2.6 切换清单扩为五处；境外过渡托管定 GitHub Pages 并进上线清单；OFL 补中文字体；OG 分中英两版（og-default-en 随 M1.5） |
+| v1.4 | 设计精进落地为 M4：三幕首页、Finale 收 S7–S9、第二幕物件化、WebGL 进门镜头（2.5D 退路）、软页换纸、房间生产管线；目录树与分工同步；P1 只留 `/about` |

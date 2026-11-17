@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import Header from '../../../components/layout/Header.astro';
 import Footer from '../../../components/layout/Footer.astro';
+import DeskSheet from '../../../components/room/DeskSheet.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blogEn');
@@ -16,20 +17,22 @@ const locale = 'en' as const;
 
 <Base locale={locale} title={`${post.data.title} · Mirrai blog`} description={post.data.description}>
   <Header locale={locale} />
-  <main class="mx-auto max-w-3xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
-    <div class="text-[0.8rem] tracking-[0.12em] text-ink-muted">
-      {post.data.pubDate.toISOString().slice(0, 10)}
-    </div>
-    <h1 class="mt-4 text-headline text-ink">{post.data.title}</h1>
-    <p class="mt-5 text-lede text-ink-muted">{post.data.description}</p>
+  <main>
+    <DeskSheet>
+      <div class="text-[0.8rem] tracking-[0.12em] text-ink-muted">
+        {post.data.pubDate.toISOString().slice(0, 10)}
+      </div>
+      <h1 class="mt-4 text-headline text-ink">{post.data.title}</h1>
+      <p class="mt-5 text-lede text-ink-muted">{post.data.description}</p>
 
-    <article class="prose-garamond mt-12 text-ink-muted">
-      <Content />
-    </article>
+      <article class="prose-garamond mt-12 text-ink-muted">
+        <Content />
+      </article>
 
-    <p class="mt-16">
-      <a class="link-quiet" href="/en/blog">← All release posts</a>
-    </p>
+      <p class="mt-16">
+        <a class="link-quiet" href="/en/blog">← All release posts</a>
+      </p>
+    </DeskSheet>
   </main>
-  <Footer locale={locale} />
+  <Footer locale={locale} edge />
 </Base>

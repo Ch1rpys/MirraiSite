@@ -33,3 +33,25 @@ SIL OFL 1.1 全文：<https://openfontlicense.org>
 
 字体文件位于 `public/fonts/`（woff2）。中文字体为按站点用字生成的子集
 （`scripts/build-fonts.mjs`），未修改字形，仅做子集化与 woff2 压缩。
+
+---
+
+## 房间场景 · The room scene
+
+首页的房间（静帧与进门镜头的三维层）是本项目自己在 Blender 里搭的场景
+（`scripts/room/build.py` → `assets/room/room.blend`），渲染结果属于上面的内容许可。
+
+场景里的几种材质用了 [Poly Haven](https://polyhaven.com) 的贴图，均为 **CC0**（公有领域，无需署名）。
+贴图本身不随仓库分发（构建场景时由 `scripts/room/fetch-textures.mjs` 下载到 `.cache/`），只以渲染后的画面出现：
+
+| 贴图 | 用途 |
+|---|---|
+| Wood Table 001 | 书桌 |
+| Walnut Veneer | 椅子、书架、床架 |
+| Wood Floor Worn | 地板 |
+| Plastered Wall 04 | 墙面 |
+| Knitted Fleece | 床上的织物 |
+| Rough Linen | 窗帘 |
+
+The room on the home page is an original Blender scene. A few materials use CC0 textures from
+Poly Haven; the textures are not redistributed here and appear only in rendered images.

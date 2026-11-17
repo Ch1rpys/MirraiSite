@@ -1,0 +1,75 @@
+---
+/**
+ * 书桌桌面：一张钉在视口里的桌面，内容像纸一样在上面滑过。
+ * 夜 = 灯下的深色木桌（和房间里那张桌子同一块木头，由三维场景俯拍渲染）；纸 = 白天的浅色橡木。
+ * `tail` 打开时，桌面在末尾沉进夜色，接第三幕的房间。
+ */
+import { getImage } from 'astro:assets';
+import deskNight from '../../assets/room/desk-top.jpg';
+import deskDay from '../../assets/room/desk-top-day.jpg';
+import { fresh } from './fresh';
+
+interface Props {
+  class?: string;
+  /** 末尾渐暗进入第三幕 */
+  tail?: boolean;
+}
+const { class: className = '', tail = false } = Astro.props;
+
+const [night, day] = await Promise.all([
+  getImage({ src: deskNight, format: 'webp', width: 1600, quality: 72 }),
+  getImage({ src: deskDay, format: 'webp', width: 1600, quality: 74 }),
+]);
+---
+
+<div
+  class:list={['desk', className]}
+  style={`--desk-night:url(${fresh(deskNight)(night.src)});--desk-day:url(${fresh(deskDay)(day.src)})`}
+>
+  <div class="desk-surface" aria-hidden="true"></div>
+  <slot />
+  {tail && <div class="desk-dusk" aria-hidden="true"></div>}
+</div>
+
+<style>
+  .desk {
+    position: relative;
+  }
+
+  .desk-surface {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    height: 100svh;
+    margin-bottom: -100svh;
+    background: #120e0b var(--desk-night) center / cover no-repeat;
+  }
+
+  :global([data-theme='paper']) .desk-surface {
+    background-color: #efe7da;
+    background-image: var(--desk-day);
+  }
+
+  .desk-surface::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+  }
+
+  :global([data-theme='paper']) .desk-surface::after {
+    background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 60%, rgba(90, 60, 30, 0.1) 100%);
+  }
+
+  .desk > :global(:not(.desk-surface)) {
+    position: relative;
+    z-index: 2;
+  }
+
+  .desk-dusk {
+    height: 55svh;
+    margin-top: -10svh;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent 0%, rgba(11, 10, 9, 0.6) 45%, #0b0a09 100%);
+  }
+</style>

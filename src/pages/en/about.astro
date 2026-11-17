@@ -6,6 +6,7 @@ import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
+import DeskSheet from '../../components/room/DeskSheet.astro';
 import ShotSlot from '../../components/layout/ShotSlot.astro';
 import { SITE_REPO, REPO, SITE } from '../../consts';
 
@@ -21,64 +22,66 @@ const { Content } = await render(entry);
   description="Mirrai traces back to mirari — to gaze. Read the full creator's notes: how an NLP researcher wrote the words he couldn't say into code."
 >
   <Header locale={locale} />
-  <main class="pb-24 pt-16 md:pt-24">
-    <!-- Brand etymology -->
-    <section class="mx-auto max-w-3xl px-5 md:px-8">
-      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Brand</div>
-      <h1 class="mt-4 text-headline text-ink">From mirari — to gaze.</h1>
-      <div class="prose-garamond mt-8 text-ink-muted">
-        <p>
-          "Mirrai" is a coined word, with etymological threads leading back to Latin <em>mirari</em> (to look at, to gaze) — through Old French
-          <em>mirer</em>, into English <em>mirror</em> and <em>mirage</em>.
-        </p>
-        <p>
-          Reflection, mirroring, the one inside your memories. A mirror for the conversations you can't have anymore.
-        </p>
-      </div>
-    </section>
+  <main>
+    <DeskSheet>
+      <!-- Brand etymology -->
+      <section class="mx-auto max-w-3xl">
+        <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Brand</div>
+        <h1 class="mt-4 text-headline text-ink">From mirari — to gaze.</h1>
+        <div class="prose-garamond mt-8 text-ink-muted">
+          <p>
+            "Mirrai" is a coined word, with etymological threads leading back to Latin <em>mirari</em> (to look at, to gaze) — through Old French
+            <em>mirer</em>, into English <em>mirror</em> and <em>mirage</em>.
+          </p>
+          <p>
+            Reflection, mirroring, the one inside your memories. A mirror for the conversations you can't have anymore.
+          </p>
+        </div>
+      </section>
 
-    <!-- Creator's notes, full text -->
-    <ShotSlot id="P1" scene="Lobby (multiple personas)" class="mt-12" />
-    <article class="mx-auto mt-20 max-w-3xl px-5 md:px-8">
-      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Creator's notes</div>
-      <div class="prose-garamond mt-6 text-ink-muted">
-        <Content />
-      </div>
-    </article>
+      <!-- Creator's notes, full text -->
+      <ShotSlot id="P1" scene="Lobby (multiple personas)" locale={locale} tilt={2.5} tape class="mx-auto mt-14 w-[min(100%,22rem)]" />
+      <article class="mx-auto mt-20 max-w-3xl">
+        <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Creator's notes</div>
+        <div class="prose-garamond mt-6 text-ink-muted">
+          <Content />
+        </div>
+      </article>
 
-    <!-- Team / Acknowledgements / License -->
-    <section class="mx-auto mt-20 max-w-3xl px-5 md:px-8">
-      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Team · Acknowledgements · License</div>
-      <div class="mt-6 space-y-8">
-        <div>
-          <h2 class="text-[1.12rem] font-medium text-ink">Team</h2>
-          <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
-            Mirrai began in the hands of an NLP student and is now maintained together by the community. The code is developed on GitHub, and discussion happens in
-            GitHub Discussions.
-          </p>
+      <!-- Team / Acknowledgements / License -->
+      <section class="mx-auto mt-20 max-w-3xl">
+        <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Team · Acknowledgements · License</div>
+        <div class="mt-6 space-y-8">
+          <div>
+            <h2 class="text-[1.12rem] font-medium text-ink">Team</h2>
+            <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
+              Mirrai began in the hands of an NLP student and is now maintained together by the community. The code is developed on GitHub, and discussion happens in
+              GitHub Discussions.
+            </p>
+          </div>
+          <div>
+            <h2 class="text-[1.12rem] font-medium text-ink">Acknowledgements</h2>
+            <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
+              Thanks to the earliest friends who tried it and said "I think I can finally let go" — you turned this project from one person's fallback
+              into a goodbye ritual for a few. Thanks to the open source community: Astro, Drizzle, Ollama, and all the shoulders we stand on.
+            </p>
+          </div>
+          <div>
+            <h2 class="text-[1.12rem] font-medium text-ink">License</h2>
+            <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
+              Code MIT licensed; content (copy, creator's notes, images) CC BY-NC-SA 4.0 — free to share non-commercially, with attribution and share-alike.
+              Third-party fonts (Cormorant Garamond / Playfair Display / EB Garamond / Noto Sans SC / Noto Serif SC)
+              are under the SIL Open Font License.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-x-8 gap-y-2 text-[0.95rem]">
+            <a class="link-quiet" href={REPO.url} target="_blank" rel="noopener">Product repo on GitHub</a>
+            <a class="link-quiet" href={SITE_REPO.url} target="_blank" rel="noopener">Site repo on GitHub</a>
+            <a class="link-quiet" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          </div>
         </div>
-        <div>
-          <h2 class="text-[1.12rem] font-medium text-ink">Acknowledgements</h2>
-          <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
-            Thanks to the earliest friends who tried it and said "I think I can finally let go" — you turned this project from one person's fallback
-            into a goodbye ritual for a few. Thanks to the open source community: Astro, Drizzle, Ollama, and all the shoulders we stand on.
-          </p>
-        </div>
-        <div>
-          <h2 class="text-[1.12rem] font-medium text-ink">License</h2>
-          <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">
-            Code MIT licensed; content (copy, creator's notes, images) CC BY-NC-SA 4.0 — free to share non-commercially, with attribution and share-alike.
-            Third-party fonts (Cormorant Garamond / Playfair Display / EB Garamond / Noto Sans SC / Noto Serif SC)
-            are under the SIL Open Font License.
-          </p>
-        </div>
-        <div class="flex flex-wrap gap-x-8 gap-y-2 text-[0.95rem]">
-          <a class="link-quiet" href={REPO.url} target="_blank" rel="noopener">Product repo on GitHub</a>
-          <a class="link-quiet" href={SITE_REPO.url} target="_blank" rel="noopener">Site repo on GitHub</a>
-          <a class="link-quiet" href={`mailto:${SITE.email}`}>{SITE.email}</a>
-        </div>
-      </div>
-    </section>
+      </section>
+    </DeskSheet>
   </main>
-  <Footer locale={locale} />
+  <Footer locale={locale} edge />
 </Base>

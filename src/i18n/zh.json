@@ -28,7 +28,12 @@
       "title": "有些话，当时没有说出口。",
       "body": "深夜想起一段对话，才发现结尾是空白。不是没有话说，是没能好好说完。你可以把那些记录交给 Mirrai——它不替谁回来，只是把没说完的，继续说完。",
       "quote": "你能对着一个程序问出这句话，却没办法对着一个真实的、爱我的人问出口。",
-      "quoteFrom": "创作手记"
+      "quoteFrom": "创作手记",
+      "letter": {
+        "date": "1,284 天前 · 23:47",
+        "ending": "我一直想跟你说——",
+        "endingLabel": "没写完"
+      }
     },
     "how": {
       "kicker": "怎么做到",
@@ -80,8 +85,7 @@
       "title": "它不是让你留下，是帮你好好告别。",
       "manifesto": "产品的成功指标不是留存率，是毕业率。",
       "demoHint": "对话 → 记忆召回可见 → 告别信",
-      "demoPlaceholder": "预录对话回放（M2 交付真版）",
-      "fadeLine": "有一天你不再需要它——那就是它做完了。"
+      "demoPlaceholder": "预录对话回放（M2 交付真版）"
     },
     "fidelity": {
       "kicker": "像不像",
@@ -131,7 +135,7 @@
     },
     "coda": {
       "kicker": "尾声",
-      "title": "有一天你不再需要它——那就是它做完了。",
+      "title": "有一天你不再需要它——\n那就是它做完了。",
       "links": {
         "github": "GitHub",
         "handnotes": "创作手记",
@@ -150,6 +154,12 @@
     "userGroup": "用户群",
     "rights": "代码 MIT · 内容 CC BY-NC-SA 4.0",
     "icp": "备案号（待备案）"
+  },
+  "intro": {
+    "skip": "跳过"
+  },
+  "shots": {
+    "undeveloped": "还没显影"
   },
   "motion": {
     "typing": "TA 在打字",

@@ -35,6 +35,9 @@
     font-family: var(--font-display);
     font-weight: 500;
     text-wrap: balance;
+    /* 中文标题只在标点处断行（不把「在线」拆开），放不下时才在任意处断 */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   p {

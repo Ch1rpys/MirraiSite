@@ -5,15 +5,17 @@ import { type Locale, localizedPath, REPO, SITE } from '../../consts';
 
 interface Props {
   locale: Locale;
+  /** 桌沿：首页与软页的页脚像书桌的前沿 */
+  edge?: boolean;
 }
 
-const { locale } = Astro.props;
+const { locale, edge = false } = Astro.props;
 const t = useDict(locale);
 const isEn = locale === 'en';
 const path = (p: string) => localizedPath(p, locale);
 ---
 
-<footer class="border-t border-hairline bg-bg">
+<footer class:list={['relative bg-bg', edge ? 'desk-edge' : 'border-t border-hairline']}>
   <div class="mx-auto max-w-6xl px-5 py-12 md:px-8 md:py-16">
     <div class="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
       <div class="max-w-sm space-y-4">
@@ -85,3 +87,23 @@ const path = (p: string) => localizedPath(p, locale);
     </div>
   </div>
 </footer>
+
+<style>
+  .desk-edge::before {
+    content: '';
+    position: absolute;
+    inset: -14px 0 auto;
+    height: 14px;
+    background:
+      linear-gradient(to bottom, rgba(255, 220, 170, 0.18) 0 1px, transparent 1px),
+      linear-gradient(to bottom, #4a3220 0%, #33221a 55%, #1d140d 100%);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+  }
+
+  :global([data-theme='paper']) .desk-edge::before {
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 0 1px, transparent 1px),
+      linear-gradient(to bottom, #d9c4a0 0%, #c4a87c 60%, #a88b60 100%);
+    box-shadow: 0 6px 12px rgba(90, 60, 30, 0.18);
+  }
+</style>

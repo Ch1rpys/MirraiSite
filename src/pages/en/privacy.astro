@@ -6,6 +6,7 @@
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
+import DeskSheet from '../../components/room/DeskSheet.astro';
 
 const locale = 'en' as const;
 
@@ -43,28 +44,30 @@ const points = [
   description="The Mirrai site has no analytics scripts and no cookies. Download counts come only from server access logs of the /go/* redirect chain. Theme preference is stored in localStorage only."
 >
   <Header locale={locale} />
-  <main class="mx-auto max-w-3xl px-5 pb-24 pt-16 md:px-8 md:pt-24">
-    <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Privacy</div>
-    <h1 class="mt-4 text-headline text-ink">Nothing here is tracking you.</h1>
-    <p class="mt-6 text-lede text-ink-muted">
-      "Data stays local" is not just a line in the product copy — this site follows it too.
-    </p>
+  <main>
+    <DeskSheet>
+      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Privacy</div>
+      <h1 class="mt-4 text-headline text-ink">Nothing here is tracking you.</h1>
+      <p class="mt-6 text-lede text-ink-muted">
+        "Data stays local" is not just a line in the product copy — this site follows it too.
+      </p>
 
-    <div class="mt-12 space-y-8">
-      {
-        points.map((p) => (
-          <div>
-            <h2 class="text-[1.12rem] font-medium text-ink">{p.title}</h2>
-            <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">{p.body}</p>
-          </div>
-        ))
-      }
-    </div>
+      <div class="mt-12 space-y-8">
+        {
+          points.map((p) => (
+            <div>
+              <h2 class="text-[1.12rem] font-medium text-ink">{p.title}</h2>
+              <p class="mt-2.5 text-[0.95rem] leading-[1.9] text-ink-muted">{p.body}</p>
+            </div>
+          ))
+        }
+      </div>
 
-    <p class="mt-14 text-[0.95rem] text-ink-muted">
-      For consent around modeling real people and the boundaries of use, see
-      <a class="link-quiet" href="/en/ethics">Ethics &amp; boundaries →</a>
-    </p>
+      <p class="mt-14 text-[0.95rem] text-ink-muted">
+        For consent around modeling real people and the boundaries of use, see
+        <a class="link-quiet" href="/en/ethics">Ethics &amp; boundaries →</a>
+      </p>
+    </DeskSheet>
   </main>
-  <Footer locale={locale} />
+  <Footer locale={locale} edge />
 </Base>

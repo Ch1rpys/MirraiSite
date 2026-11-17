@@ -6,9 +6,11 @@ import { type Locale, localizedPath, REPO, USE_GITHUB_RELEASES_CTA } from '../..
 
 interface Props {
   locale: Locale;
+  /** 首页：页眉浮在照片场景（data-night-stage）上方，经过时透明、用夜色；属性值是场景底部渐隐的比例 */
+  overlay?: boolean;
 }
 
-const { locale } = Astro.props;
+const { locale, overlay = false } = Astro.props;
 const t = useDict(locale);
 
 const anchors = [
@@ -22,7 +24,13 @@ const otherLocale: Locale = locale === 'en' ? 'zh' : 'en';
 const langHref = localizedPath(Astro.url.pathname.replace(/^\/en(?=\/|$)/, '') || '/', otherLocale);
 ---
 
-<header class="sticky top-0 z-40 border-b border-hairline bg-bg/88 backdrop-blur-md">
+<header
+  class:list={[
+    'site-header top-0 z-40 border-b border-hairline bg-bg/88 backdrop-blur-md',
+    overlay ? 'fixed inset-x-0' : 'sticky',
+  ]}
+  data-overlay={overlay ? '' : undefined}
+>
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 md:px-8">
     <a
       href={localizedPath('/', locale)}
@@ -82,3 +90,56 @@ const langHref = localizedPath(Astro.url.pathname.replace(/^\/en(?=\/|$)/, '') |
     }
   </nav>
 </header>
+
+{
+  overlay && (
+    <script>
+      const header = document.querySelector<HTMLElement>('.site-header[data-overlay]');
+      if (header) {
+        let ticking = false;
+        const update = () => {
+          ticking = false;
+          const line = header.offsetHeight;
+          const stages = Array.from(document.querySelectorAll<HTMLElement>('[data-night-stage]'));
+          const over = stages.some((s) => {
+            const r = s.getBoundingClientRect();
+            const fade = parseFloat(s.dataset.nightStage ?? '') || 0;
+            return r.top <= line && r.bottom - r.height * fade >= line;
+          });
+          header.classList.toggle('is-over-stage', over);
+          if (over) header.setAttribute('data-theme', 'night');
+          else header.removeAttribute('data-theme');
+        };
+        const onScroll = () => {
+          if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(update);
+          }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+        update();
+      }
+    </script>
+  )
+}
+
+<style>
+  .site-header {
+    transition:
+      background-color 0.45s var(--ease-soft),
+      border-color 0.45s var(--ease-soft),
+      backdrop-filter 0.45s var(--ease-soft);
+  }
+
+  .site-header.is-over-stage {
+    background-color: transparent;
+    background-image: linear-gradient(to bottom, rgba(8, 7, 6, 0.6), rgba(8, 7, 6, 0));
+    border-color: transparent;
+    backdrop-filter: none;
+  }
+
+  .site-header.is-over-stage nav {
+    border-color: transparent;
+  }
+</style>

@@ -1,4 +1,8 @@
 ---
+/**
+ * 第二幕 · 像不像：一张索引卡写着判别规则，一把木尺上刻着保真之尺的四个刻度。
+ * 人格档案截图（P7）用回形针别在卡片角上。
+ */
 import { useDict } from '../../i18n';
 import type { Locale } from '../../consts.ts';
 import ShotSlot from '../layout/ShotSlot.astro';
@@ -9,56 +13,243 @@ interface Props {
 const { locale } = Astro.props;
 const t = useDict(locale);
 const s = t.sections.fidelity;
+const marks = [14, 38, 62, 86];
+const numbers = Array.from({ length: 13 }, (_, i) => i);
 ---
 
-<section id="fidelity" class="relative py-24 md:py-32">
-  <div class="mx-auto max-w-6xl px-5 md:px-8">
-    <div class="max-w-2xl">
+<section id="fidelity" class="py-24 md:py-36">
+  <div class="mx-auto grid max-w-6xl gap-14 px-5 md:grid-cols-12 md:gap-10 md:px-8">
+    <div class="md:order-2 md:col-span-4 md:col-start-9 md:pt-10">
       <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
       <h2 class="mt-4 text-headline text-ink">{s.title}</h2>
+      <p class="mt-6 text-[0.95rem] leading-[1.9] text-ink-muted">{s.local}</p>
     </div>
 
-    <!-- 判别规则图：触发词 → 含义 → 表现 -->
-    <div class="mt-12">
-      <div class="text-[0.8rem] tracking-[0.18em] text-ink-muted">{s.ruleTitle}</div>
-      <div class="mt-5 flex flex-wrap items-stretch gap-3">
-        {
-          s.ruleChain.map((node, i) => (
-            <>
-              {i > 0 && (
-                <span class="flex items-center text-lamp/70" aria-hidden="true">
-                  →
-                </span>
-              )}
-              <div class="hairline min-w-[7.5rem] flex-1 rounded-xl border bg-surface/60 px-5 py-4 text-center text-[0.95rem] text-ink">
-                {node}
-              </div>
-            </>
-          ))
-        }
+    <div class="relative md:order-1 md:col-span-8">
+      <div class="card-wrap paper-lift">
+        <article class="paper paper-card index-card">
+          <div class="text-[0.75rem] tracking-[0.22em] ink-pencil">{s.ruleTitle}</div>
+          <div class="chain mt-7">
+            {
+              s.ruleChain.map((node, i) => (
+                <>
+                  {i > 0 && (
+                    <span class="chain-arrow" aria-hidden="true">
+                      ⟶
+                    </span>
+                  )}
+                  <span class="chain-node">{node}</span>
+                </>
+              ))
+            }
+          </div>
+          <p class="card-example">{s.ruleExample}</p>
+        </article>
+        <span class="clip" aria-hidden="true"></span>
       </div>
-      <p class="mt-5 text-[0.95rem] leading-[1.9] text-ink-muted">{s.ruleExample}</p>
-    </div>
 
-    <!-- 保真之尺 -->
-    <div class="mt-12">
-      <div class="text-[0.8rem] tracking-[0.18em] text-ink-muted">{s.scaleTitle}</div>
-      <ul class="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {
-          s.scaleItems.map((item) => (
-            <li class="hairline rounded-xl border px-4 py-4 text-center text-[0.92rem] text-ink">
-              {item}
-            </li>
-          ))
-        }
-      </ul>
-      <p class="mt-5 text-[0.95rem] text-ink-muted">{s.local}</p>
-    </div>
+      <div class="card-shot">
+        <ShotSlot
+          id="P7"
+          scene={locale === 'en' ? 'Persona profile (7 layers)' : '人格档案页（7 层人设）'}
+          locale={locale}
+          tilt={5}
+        />
+      </div>
 
-    <ShotSlot
-      id="P7"
-      scene={locale === 'en' ? 'Persona profile (7 layers)' : '人格档案页（7 层人设）'}
-      class="mt-12"
-    />
+      <div class="ruler-wrap paper-lift">
+        <div class="ruler" role="list" aria-label={s.scaleTitle}>
+          <div class="ruler-ticks" aria-hidden="true"></div>
+          <div class="ruler-numbers" aria-hidden="true">
+            {numbers.map((n) => <span style={`left:calc(${n} * 5rem)`}>{n}</span>)}
+          </div>
+          {
+            s.scaleItems.map((item, i) => (
+              <div class="ruler-mark" role="listitem" style={`left:${marks[i]}%`}>
+                <span class="ruler-notch" aria-hidden="true" />
+                <span class="ruler-label">{item}</span>
+              </div>
+            ))
+          }
+          <span class="ruler-brand" aria-hidden="true">{s.scaleTitle}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
+
+<style>
+  .card-wrap {
+    position: relative;
+    width: min(100%, 34rem);
+    rotate: -1.6deg;
+  }
+
+  .index-card {
+    padding: 1.3rem 1.8rem 2rem;
+    background-image:
+      linear-gradient(
+        to bottom,
+        transparent 2.9rem,
+        rgba(168, 70, 56, 0.4) 2.9rem,
+        rgba(168, 70, 56, 0.4) calc(2.9rem + 1px),
+        transparent calc(2.9rem + 1px)
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(2rem - 1px),
+        var(--paper-rule) calc(2rem - 1px) 2rem
+      ),
+      radial-gradient(120% 85% at 100% 0%, var(--paper-lit), transparent 62%);
+    background-position:
+      0 0,
+      0 4.1rem,
+      0 0;
+    background-repeat: no-repeat, repeat-y, no-repeat;
+  }
+
+  .chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 0.9rem;
+  }
+
+  .chain-node {
+    font-family: var(--font-display);
+    font-size: clamp(1.3rem, 2.4vw, 1.65rem);
+    color: var(--paper-ink);
+  }
+
+  .chain-arrow {
+    color: #a26a37;
+    font-size: 1.2rem;
+  }
+
+  .card-example {
+    margin-top: 1.3rem;
+    font-size: 0.98rem;
+    line-height: 2rem;
+    color: var(--paper-ink-muted);
+  }
+
+  /* 回形针 */
+  .clip {
+    position: absolute;
+    top: -0.9rem;
+    right: 5.5rem;
+    width: 0.95rem;
+    height: 2.8rem;
+    border: 2px solid #9aa0a6;
+    border-radius: 0.6rem;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+    z-index: 4;
+  }
+
+  .clip::after {
+    content: '';
+    position: absolute;
+    inset: 0.35rem 0.12rem 0.55rem;
+    border: 2px solid #9aa0a6;
+    border-radius: 0.45rem;
+  }
+
+  .card-shot {
+    width: min(52%, 15rem);
+    margin: -2.5rem 0 0 auto;
+  }
+
+  .ruler-wrap {
+    margin-top: 3rem;
+    rotate: 0.8deg;
+  }
+
+  .ruler {
+    position: relative;
+    height: 5.4rem;
+    overflow: hidden;
+    border-radius: 3px;
+    background:
+      repeating-linear-gradient(
+        172deg,
+        rgba(120, 80, 36, 0) 0 9px,
+        rgba(120, 80, 36, 0.07) 9px 11px,
+        rgba(120, 80, 36, 0) 11px 23px
+      ),
+      linear-gradient(to bottom, #dcc497 0%, #cdb07c 55%, #ba9862 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 245, 220, 0.5),
+      inset 0 -2px 0 rgba(80, 52, 20, 0.25);
+  }
+
+  .ruler-ticks {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1.4rem;
+    background:
+      repeating-linear-gradient(90deg, rgba(42, 28, 12, 0.85) 0 1.2px, transparent 1.2px 5rem) 0 0 / auto 1.35rem repeat-x,
+      repeating-linear-gradient(90deg, rgba(42, 28, 12, 0.75) 0 1px, transparent 1px 2.5rem) 0 0 / auto 0.95rem repeat-x,
+      repeating-linear-gradient(90deg, rgba(42, 28, 12, 0.6) 0 1px, transparent 1px 0.5rem) 0 0 / auto 0.55rem repeat-x;
+  }
+
+  .ruler-numbers span {
+    position: absolute;
+    top: 1.45rem;
+    translate: -50% 0;
+    margin-left: 1px;
+    font-size: 0.62rem;
+    color: rgba(42, 28, 12, 0.7);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ruler-numbers span:first-child {
+    translate: 2px 0;
+  }
+
+  .ruler-mark {
+    position: absolute;
+    bottom: 0.7rem;
+    translate: -50% 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+  }
+
+  .ruler-notch {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: #a0602c;
+    box-shadow: 0 0 0 2px rgba(255, 235, 200, 0.35);
+  }
+
+  .ruler-label {
+    font-size: 0.82rem;
+    color: #2a1d10;
+  }
+
+  .ruler-brand {
+    position: absolute;
+    right: 0.8rem;
+    top: 1.5rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    color: rgba(42, 28, 12, 0.55);
+  }
+
+  @media (max-width: 639px) {
+    .ruler {
+      height: 6.6rem;
+    }
+
+    .ruler-mark:nth-of-type(even) {
+      bottom: 2.6rem;
+    }
+
+    .ruler-brand {
+      display: none;
+    }
+  }
+</style>

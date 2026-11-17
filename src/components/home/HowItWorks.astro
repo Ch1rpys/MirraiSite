@@ -1,4 +1,7 @@
 ---
+/**
+ * 第二幕 · 怎么做到：桌上三张拍立得（上传 / 蒸馏 / 对话），那句硬话写在一条胶带上。
+ */
 import { useDict } from '../../i18n';
 import type { Locale } from '../../consts.ts';
 import ShotSlot from '../layout/ShotSlot.astro';
@@ -9,50 +12,105 @@ interface Props {
 const { locale } = Astro.props;
 const t = useDict(locale);
 const s = t.sections.how;
+
+const shots = [
+  { id: 'P3', scene: locale === 'en' ? 'Upload materials' : '上传素材页', tilt: -3.5 },
+  { id: 'P4', scene: locale === 'en' ? 'Distillation progress' : '蒸馏进度', tilt: 2.6 },
+  { id: 'P2', scene: locale === 'en' ? 'Conversation' : '对话界面', tilt: -1.4 },
+] as const;
 ---
 
-<section id="how" class="relative py-24 md:py-32">
-  <div class="mx-auto max-w-6xl px-5 md:px-8">
-    <div class="max-w-2xl">
-      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
-      <h2 class="mt-4 text-headline text-ink">{s.title}</h2>
+<section id="how" class="py-24 md:py-36">
+  <div class="mx-auto grid max-w-6xl gap-14 px-5 md:grid-cols-12 md:gap-10 md:px-8">
+    <div class="md:col-span-4">
+      <div class="md:sticky md:top-32">
+        <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
+        <h2 class="mt-4 text-headline text-ink">{s.title}</h2>
+        <p class="how-strip mt-10">{s.hardline}</p>
+      </div>
     </div>
 
-    <ShotSlot id="P1" scene={locale === 'en' ? 'Lobby (multiple personas)' : '大厅（多分身）'} class="mt-12" />
-
-    <ol class="mt-12 grid gap-10 md:grid-cols-3">
+    <ol class="how-spread md:col-span-8">
       {
         s.steps.map((step, i) => (
-          <li class="relative">
-            <div class="font-display text-[2.1rem] leading-none text-lamp/85">{step.n}</div>
-            <h3 class="mt-4 text-[1.12rem] font-medium text-ink">{step.title}</h3>
-            <p class="mt-3 text-[0.95rem] leading-[1.9] text-ink-muted">{step.body}</p>
+          <li class:list={['how-item', `how-item-${i + 1}`]}>
             <ShotSlot
-              id={i === 0 ? 'P3' : i === 1 ? 'P4' : 'P2'}
-              scene={
-                i === 0
-                  ? locale === 'en'
-                    ? 'Upload materials'
-                    : '上传素材页'
-                  : i === 1
-                    ? locale === 'en'
-                      ? 'Distillation progress'
-                      : '蒸馏进度'
-                    : locale === 'en'
-                      ? 'Conversation'
-                      : '对话界面'
-              }
-              class="mt-5"
+              id={shots[i].id}
+              scene={shots[i].scene}
+              caption={`${step.n}　${step.title}`}
+              locale={locale}
+              tilt={shots[i].tilt}
+              tape={i !== 1}
             />
+            <p class="how-note">{step.body}</p>
           </li>
         ))
       }
     </ol>
-
-    <p class="mt-14 max-w-2xl border-l-2 border-lamp/60 pl-6 font-display text-[1.3rem] leading-relaxed text-ink">
-      {s.hardline}
-    </p>
-
-
   </div>
 </section>
+
+<style>
+  .how-strip {
+    position: relative;
+    display: inline-block;
+    max-width: 22rem;
+    padding: 0.85rem 1.35rem;
+    rotate: -1.2deg;
+    background: rgba(232, 220, 192, 0.86);
+    color: #2a231c;
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    line-height: 1.65;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    clip-path: polygon(
+      0% 6%, 1.5% 0%, 3% 8%, 4.5% 1%, 95.5% 0%, 97% 9%, 98.5% 2%, 100% 8%,
+      100% 92%, 98.5% 100%, 97% 91%, 95.5% 99%, 4.5% 100%, 3% 92%, 1.5% 99%, 0% 93%
+    );
+  }
+
+  .how-spread {
+    display: grid;
+    gap: 3.5rem;
+  }
+
+  .how-item {
+    width: min(100%, 22rem);
+  }
+
+  .how-item:nth-child(even) {
+    justify-self: end;
+  }
+
+  .how-note {
+    margin-top: 1.4rem;
+    padding: 0 0.4rem;
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: var(--color-ink-muted);
+  }
+
+  @media (min-width: 768px) {
+    .how-spread {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 2.5rem;
+      row-gap: 0;
+    }
+
+    .how-item {
+      width: auto;
+    }
+
+    .how-item-2 {
+      justify-self: stretch;
+      margin-top: 7rem;
+    }
+
+    .how-item-3 {
+      grid-column: 1 / -1;
+      justify-self: start;
+      width: 54%;
+      margin: 1.5rem 0 0 12%;
+    }
+  }
+</style>

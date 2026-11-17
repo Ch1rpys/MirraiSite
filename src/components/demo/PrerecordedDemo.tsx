@@ -65,13 +65,17 @@ const SCRIPTS: Record<Locale, DemoMessage[]> = {
   ],
 };
 
-const LABELS: Record<Locale, { badge: string; next: string; play: string; pause: string; replay: string; typing: string }> = {
-  zh: { badge: '演示数据', next: '下一条', play: '自动播放', pause: '暂停', replay: '重新播放', typing: 'TA 在打字' },
-  en: { badge: 'Demo data', next: 'Next', play: 'Auto play', pause: 'Pause', replay: 'Replay', typing: 'typing' },
+const LABELS: Record<
+  Locale,
+  { badge: string; next: string; play: string; pause: string; replay: string; typing: string; me: string; ta: string }
+> = {
+  zh: { badge: '演示数据', next: '下一条', play: '自动播放', pause: '暂停', replay: '重新播放', typing: 'TA 在打字', me: '我', ta: 'TA' },
+  en: { badge: 'Demo data', next: 'Next', play: 'Auto play', pause: 'Pause', replay: 'Replay', typing: 'typing', me: 'you', ta: 'them' },
 };
 
 const STEP_MS = 2400;
 
+/** 预录对话回放：写在一页撕下来的横线本上，控件就在纸的下沿。 */
 export default function PrerecordedDemo({ locale = 'zh' }: { locale?: Locale }) {
   const messages = SCRIPTS[locale];
   const labels = LABELS[locale];
@@ -111,17 +115,45 @@ export default function PrerecordedDemo({ locale = 'zh' }: { locale?: Locale }) 
     };
   }, [playing, visible, done, advance, messages.length]);
 
-  const showAll = () => {
-    setPlaying(false);
-    setTyping(false);
-    setVisible(messages.length);
-  };
-
   return (
-    <div className="hairline overflow-hidden rounded-2xl border bg-surface/70">
-      <div className="hairline flex items-center justify-between gap-3 border-b px-4 py-3">
-        <span className="tag-ghost">{labels.badge}</span>
-        <div className="flex items-center gap-2">
+    <div className="paper-lift demo-wrap">
+      <div className="paper paper-white paper-lined paper-torn demo-page">
+        <span className="demo-badge">{labels.badge}</span>
+
+        <ol className="demo-lines" aria-live="polite">
+          {messages.slice(0, visible).map((m, i) => (
+            <li key={i} className={`demo-line demo-${m.from}${m.kind === 'farewell' ? ' demo-is-farewell' : ''}`}>
+              <span className="demo-who" aria-hidden="true">
+                {m.from === 'user' ? labels.me : labels.ta}
+              </span>
+              <div className="demo-text">
+                {m.kind === 'letter' ? (
+                  <div className="paper demo-letter">
+                    <span className="demo-letter-mark" aria-hidden="true">
+                      ✉
+                    </span>
+                    {m.text}
+                  </div>
+                ) : (
+                  <p className={m.kind === 'farewell' ? 'demo-farewell' : undefined}>{m.text}</p>
+                )}
+                {m.emotion && <span className="demo-emotion">· {m.emotion}</span>}
+                {m.memory && <span className="demo-memory">↳ {m.memory}</span>}
+              </div>
+            </li>
+          ))}
+          {typing && !done && (
+            <li className="demo-line demo-typing">
+              <span className="demo-who" aria-hidden="true" />
+              <span className="demo-typing-text">
+                <span className="demo-lamp" aria-hidden="true" />
+                {labels.typing}
+              </span>
+            </li>
+          )}
+        </ol>
+
+        <div className="demo-controls">
           {!done && (
             <button
               type="button"
@@ -129,26 +161,17 @@ export default function PrerecordedDemo({ locale = 'zh' }: { locale?: Locale }) 
                 setPlaying(false);
                 advance();
               }}
-              className="hairline rounded-full border px-3 py-1.5 text-[0.8rem] text-ink-muted transition-colors hover:text-lamp-deep"
             >
               {labels.next}
             </button>
           )}
           {!done &&
             (playing ? (
-              <button
-                type="button"
-                onClick={() => setPlaying(false)}
-                className="hairline rounded-full border px-3 py-1.5 text-[0.8rem] text-ink-muted transition-colors hover:text-lamp-deep"
-              >
+              <button type="button" onClick={() => setPlaying(false)}>
                 {labels.pause}
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => setPlaying(true)}
-                className="rounded-full bg-lamp px-3 py-1.5 text-[0.8rem] text-bg transition-opacity hover:opacity-85"
-              >
+              <button type="button" className="is-primary" onClick={() => setPlaying(true)}>
                 {labels.play}
               </button>
             ))}
@@ -159,7 +182,6 @@ export default function PrerecordedDemo({ locale = 'zh' }: { locale?: Locale }) 
                 setVisible(1);
                 setPlaying(true);
               }}
-              className="hairline rounded-full border px-3 py-1.5 text-[0.8rem] text-ink-muted transition-colors hover:text-lamp-deep"
             >
               {labels.replay}
             </button>
@@ -167,73 +189,120 @@ export default function PrerecordedDemo({ locale = 'zh' }: { locale?: Locale }) 
         </div>
       </div>
 
-      <div className="flex min-h-[22rem] flex-col gap-4 px-4 py-6 sm:px-6">
-        {messages.slice(0, visible).map((m, i) => (
-          <div key={i} className={m.from === 'user' ? 'flex justify-start' : 'flex justify-end'}>
-            <div className="max-w-[85%] sm:max-w-[72%]">
-              {m.kind === 'letter' || m.kind === 'farewell' ? (
-                <div className="hairline rounded-xl border border-dashed bg-bg/60 px-4 py-4">
-                  {m.kind === 'letter' && (
-                    <div className="mb-2 text-[0.72rem] tracking-[0.16em] text-lamp-deep">✉</div>
-                  )}
-                  <p
-                    className={
-                      m.kind === 'farewell'
-                        ? 'font-display text-[1.15rem] leading-relaxed text-ink'
-                        : 'text-[0.95rem] leading-relaxed text-ink'
-                    }
-                  >
-                    {m.text}
-                  </p>
-                  {m.emotion && (
-                    <div className="mt-2.5 text-[0.72rem] tracking-[0.12em] text-ink-muted">{m.emotion}</div>
-                  )}
-                </div>
-              ) : m.from === 'ta' ? (
-                <div>
-                  <div className="rounded-2xl rounded-tr-sm bg-lamp/18 px-4 py-3 text-[0.95rem] leading-relaxed text-ink">
-                    {m.text}
-                  </div>
-                  {m.emotion && (
-                    <div className="mt-1.5 text-right text-[0.72rem] tracking-[0.12em] text-ink-muted">{m.emotion}</div>
-                  )}
-                </div>
-              ) : (
-                <div className="hairline rounded-2xl rounded-tl-sm border px-4 py-3 text-[0.95rem] leading-relaxed text-ink-muted">
-                  {m.text}
-                </div>
-              )}
-              {m.memory && (
-                <div className="mt-2 flex justify-end">
-                  <div className="hairline rounded-full border border-dashed px-3 py-1.5 text-[0.75rem] text-ink-muted">
-                    {m.memory}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-
-        {typing && !done && (
-          <div className="flex justify-end">
-            <div className="flex items-center gap-2 px-2 text-[0.78rem] text-ink-muted">
-              <span
-                className="inline-block h-2 w-2 rounded-full bg-lamp"
-                style={{ animation: 'lamp-pulse 1.2s ease-in-out infinite' }}
-              />
-              {labels.typing}
-            </div>
-          </div>
-        )}
-      </div>
-
       <style>{`
-        @keyframes lamp-pulse {
+        .demo-wrap { rotate: 0.6deg; }
+        .demo-page {
+          --margin-x: 3.4rem;
+          --lines-top: 3.9rem;
+          padding: 3.9rem 1.6rem 1.4rem 0;
+          min-height: 36rem;
+          display: flex;
+          flex-direction: column;
+        }
+        .demo-badge {
+          position: absolute;
+          top: 1.35rem;
+          right: 1.4rem;
+          padding: 0.1rem 0.6rem;
+          border: 1.5px solid rgba(168, 70, 56, 0.55);
+          border-radius: 3px;
+          rotate: -3deg;
+          font-size: 0.68rem;
+          line-height: 1.6;
+          letter-spacing: 0.2em;
+          color: rgba(168, 70, 56, 0.8);
+        }
+        .demo-lines { flex: 1; }
+        .demo-line {
+          display: grid;
+          grid-template-columns: var(--margin-x) 1fr;
+          animation: demo-ink 0.7s ease-out both;
+        }
+        .demo-who {
+          padding-right: 0.7rem;
+          text-align: right;
+          font-size: 0.7rem;
+          letter-spacing: 0.08em;
+          color: var(--paper-pencil);
+        }
+        .demo-text { padding-left: 0.9rem; }
+        .demo-user .demo-text p { color: var(--paper-ink-muted); font-size: 0.97rem; }
+        .demo-ta .demo-text p {
+          color: var(--paper-ink);
+          font-family: var(--font-display);
+          font-size: 1.06rem;
+        }
+        .demo-emotion, .demo-memory {
+          display: block;
+          font-size: 0.75rem;
+          letter-spacing: 0.06em;
+          color: var(--paper-pencil);
+        }
+        .demo-memory {
+          width: fit-content;
+          text-decoration: underline dashed rgba(122, 109, 93, 0.6);
+          text-underline-offset: 0.3em;
+        }
+        .demo-letter {
+          margin: 0.5rem 0;
+          padding: 0.45rem 1rem 0.55rem;
+          rotate: -1deg;
+          width: fit-content;
+          max-width: 100%;
+          font-size: 0.95rem;
+          line-height: 1.75rem;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 6px 12px -6px rgba(0, 0, 0, 0.3);
+        }
+        .demo-letter-mark { margin-right: 0.5rem; color: #a26a37; }
+        .demo-is-farewell { margin-top: 1.95rem; align-items: baseline; }
+        .demo-text p.demo-farewell {
+          font-size: 1.4rem;
+          color: #8f5a2e;
+        }
+        .demo-typing-text {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding-left: 0.9rem;
+          font-size: 0.78rem;
+          color: var(--paper-pencil);
+        }
+        .demo-lamp {
+          width: 0.5rem;
+          height: 0.5rem;
+          border-radius: 50%;
+          background: #e4a868;
+          box-shadow: 0 0 10px rgba(228, 168, 104, 0.8);
+          animation: demo-lamp 1.2s ease-in-out infinite;
+        }
+        .demo-controls {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.4rem 1.4rem;
+          margin-top: 1.95rem;
+          padding-left: calc(var(--margin-x) + 0.9rem);
+        }
+        .demo-controls button {
+          font-size: 0.82rem;
+          letter-spacing: 0.08em;
+          color: var(--paper-ink-muted);
+          text-decoration: underline;
+          text-decoration-color: rgba(42, 35, 28, 0.25);
+          text-underline-offset: 0.3em;
+          transition: color 0.2s;
+        }
+        .demo-controls button:hover { color: #8f5a2e; }
+        .demo-controls button.is-primary { color: #8f5a2e; text-decoration-color: rgba(143, 90, 46, 0.5); }
+        @keyframes demo-ink { from { opacity: 0; filter: blur(1.5px); } to { opacity: 1; filter: none; } }
+        @keyframes demo-lamp {
           0%, 100% { transform: scale(1); opacity: .65; }
           50% { transform: scale(1.35); opacity: 1; }
         }
+        @media (max-width: 639px) {
+          .demo-page { --margin-x: 2.6rem; padding-right: 1.1rem; }
+        }
         @media (prefers-reduced-motion: reduce) {
-          [style*='lamp-pulse'] { animation: none !important; }
+          .demo-line, .demo-lamp { animation: none; }
         }
       `}</style>
     </div>

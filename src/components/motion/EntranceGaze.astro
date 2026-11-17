@@ -1,7 +1,7 @@
 ---
 /**
  * M1 入场「对望」：左右气泡相向滑入 → 镜面轴落下 → 字标渐开字距浮现
- * 用途：首屏入场。prefers-reduced-motion 下直接呈现终态。
+ * 用途：首屏入场，进门镜头落定后才开始（--gaze-delay 由 RoomIntro 提供）。prefers-reduced-motion 下直接呈现终态。
  */
 interface Props {
   class?: string;
@@ -19,19 +19,19 @@ const { class: className = '' } = Astro.props;
   }
 
   .entrance-gaze :global(.gaze-left) {
-    animation: gaze-from-left 0.9s var(--ease-soft) both;
+    animation: gaze-from-left 0.9s var(--ease-soft) var(--gaze-delay, 0s) both;
   }
 
   .entrance-gaze :global(.gaze-right) {
-    animation: gaze-from-right 0.9s var(--ease-soft) 0.08s both;
+    animation: gaze-from-right 0.9s var(--ease-soft) calc(var(--gaze-delay, 0s) + 0.08s) both;
   }
 
   .entrance-gaze :global(.gaze-axis) {
-    animation: axis-drop 0.7s var(--ease-gentle) 0.55s both;
+    animation: axis-drop 0.7s var(--ease-gentle) calc(var(--gaze-delay, 0s) + 0.55s) both;
   }
 
   .entrance-gaze :global(.gaze-word) {
-    animation: word-open 1.1s var(--ease-soft) 0.7s both;
+    animation: word-open 1.1s var(--ease-soft) calc(var(--gaze-delay, 0s) + 0.1s) both;
   }
 
   @keyframes gaze-from-left {

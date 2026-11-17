@@ -1,4 +1,9 @@
 ---
+/**
+ * 第二幕高潮 · 毕业机制：对话写在一页撕下来的横线本上；读完，字迹淡去（M4），
+ * 浮出那句宣言，桌面随之沉进夜色——第三幕从这里开始。
+ * 尾句只在第三幕灯灭时出现一次，这里不重复。
+ */
 import PrerecordedDemo from '../demo/PrerecordedDemo.tsx';
 import GraduationFade from '../motion/GraduationFade.astro';
 import MessageTrace from '../motion/MessageTrace.astro';
@@ -14,36 +19,48 @@ const t = useDict(locale);
 const s = t.sections.graduation;
 ---
 
-<section id="graduation" class="relative overflow-hidden py-24 md:py-32">
-  <div class="glow-lamp absolute inset-x-0 top-0 h-1/2 opacity-70" aria-hidden="true"></div>
+<section id="graduation" class="pb-10 pt-24 md:pt-36">
+  <div class="mx-auto max-w-6xl px-5 md:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
+      <h2 class="mt-5 text-display text-ink">{s.title}</h2>
+    </div>
 
-  <div class="relative mx-auto max-w-6xl px-5 md:px-8">
-    <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">{s.kicker}</div>
-
-    <h2 class="mt-5 max-w-3xl text-display text-ink">{s.title}</h2>
-
-    <p class="mt-8 border-l-2 border-lamp/60 pl-6 text-lede text-ink-muted">{s.manifesto}</p>
-
-    <div class="mt-14">
+    <div class="grad-desk relative mx-auto mt-16 max-w-[40rem] md:mt-20">
       <PrerecordedDemo client:visible locale={locale} />
+      <div class="grad-shot">
+        <ShotSlot
+          id="P5"
+          scene={locale === 'en' ? 'Graduation / farewell letter' : '毕业 / 告别信'}
+          locale={locale}
+          tilt={-4}
+          tape
+        />
+      </div>
     </div>
 
-    <div class="mt-14 grid gap-6 md:grid-cols-2">
-      <ShotSlot
-        id="P5"
-        scene={locale === 'en' ? 'Graduation / farewell letter' : '毕业 / 告别信'}
-      />
-      <ShotSlot
-        id="P2"
-        scene={locale === 'en' ? 'Conversation (emotion + memory recall)' : '对话界面（情感状态 + 记忆召回）'}
-      />
-    </div>
-
-    <GraduationFade class="mt-20">
+    <GraduationFade class="mx-auto mt-24 max-w-2xl md:mt-32">
       <MessageTrace slot="traces" count={4} />
-      <p class="font-display text-[1.45rem] leading-relaxed text-ink md:text-[1.75rem]">
-        {s.fadeLine}
+      <p class="text-center font-display text-[1.45rem] leading-relaxed text-ink md:text-[1.85rem]">
+        {s.manifesto}
       </p>
     </GraduationFade>
   </div>
 </section>
+
+<style>
+  .grad-shot {
+    width: min(70%, 16rem);
+    margin: 2.5rem auto 0;
+  }
+
+  @media (min-width: 1100px) {
+    .grad-shot {
+      position: absolute;
+      top: 38%;
+      right: -15rem;
+      width: 14.5rem;
+      margin: 0;
+    }
+  }
+</style>

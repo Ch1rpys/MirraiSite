@@ -1,0 +1,54 @@
+---
+/**
+ * 软页（关于 / 伦理 / 隐私 / 博客）：还在同一张桌前，只是换一叠纸。
+ * 长文要读得舒服，所以这张纸跟随主题：夜里是灯下的深色纸，白天是浅色纸。
+ */
+import Desk from './Desk.astro';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<Desk>
+  <div class="sheet-stage px-3 pb-20 pt-8 sm:px-5 md:pb-28 md:pt-14">
+    <div class="sheet-wrap paper-lift mx-auto max-w-[52rem]">
+      <div class:list={['sheet', className]}>
+        <slot />
+      </div>
+    </div>
+  </div>
+</Desk>
+
+<style>
+  .sheet-wrap {
+    rotate: -0.3deg;
+  }
+
+  .sheet {
+    position: relative;
+    padding: clamp(1.75rem, 6vw, 4rem) clamp(1.25rem, 6vw, 4rem) clamp(2.25rem, 6vw, 4.5rem);
+    background-color: #1f1a15;
+    background-image:
+      radial-gradient(110% 60% at 100% 0%, rgba(228, 168, 104, 0.09), transparent 60%),
+      linear-gradient(to bottom left, transparent 50%, rgba(0, 0, 0, 0.18));
+  }
+
+  :global([data-theme='paper']) .sheet {
+    background-color: #fcf9f3;
+    background-image:
+      radial-gradient(110% 60% at 0% 0%, rgba(255, 255, 255, 0.6), transparent 60%),
+      linear-gradient(to bottom right, transparent 55%, rgba(96, 66, 34, 0.05));
+  }
+
+  .sheet::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23s)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+</style>
