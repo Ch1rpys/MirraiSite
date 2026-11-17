@@ -262,7 +262,7 @@ MirraiSite/
 - [ ] **公安备案**（ICP 通过后 30 日内，全国互联网安全管理服务平台）
 
 **部署**
-- [ ] 境外过渡托管部署（**GitHub Pages**）+ `mirrai.ink` 解析指过去——M1 公开即在此
+- [x] 境外过渡托管部署（**GitHub Pages**，Actions 构建）+ `mirrai.ink` 解析指过去（Cloudflare DNS → GitHub Pages IP；www CNAME）
 - [ ] 大陆云静态托管（OSS/COS + CDN 或静态站点服务，备案后切换）
 - [ ] HTTPS 证书
 - [ ] `www` 与裸域跳转策略
