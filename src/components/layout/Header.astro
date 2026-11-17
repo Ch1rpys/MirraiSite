@@ -1,5 +1,6 @@
 ---
 import Lockup from '../logo/Lockup.tsx';
+import EntranceGaze from '../motion/EntranceGaze.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { useDict } from '../../i18n';
 import { type Locale, localizedPath, REPO, USE_GITHUB_RELEASES_CTA } from '../../consts.ts';
@@ -37,8 +38,19 @@ const langHref = localizedPath(Astro.url.pathname.replace(/^\/en(?=\/|$)/, '') |
       class="shrink-0 text-ink transition-opacity hover:opacity-85"
       aria-label="Mirrai"
     >
-      <Lockup variant="horizontal" symbolSize={52} wordmarkSize={21} className="max-md:hidden" />
-      <Lockup variant="horizontal" symbolSize={42} wordmarkSize={18} className="md:hidden" />
+      {
+        overlay ? (
+          <EntranceGaze>
+            <Lockup variant="horizontal" symbolSize={52} wordmarkSize={21} className="gaze-word max-md:hidden" />
+            <Lockup variant="horizontal" symbolSize={42} wordmarkSize={18} className="gaze-word md:hidden" />
+          </EntranceGaze>
+        ) : (
+          <>
+            <Lockup variant="horizontal" symbolSize={52} wordmarkSize={21} className="max-md:hidden" />
+            <Lockup variant="horizontal" symbolSize={42} wordmarkSize={18} className="md:hidden" />
+          </>
+        )
+      }
     </a>
 
     <nav class="hidden items-center gap-7 text-[0.925rem] text-ink-muted md:flex" aria-label={t.nav.menu}>

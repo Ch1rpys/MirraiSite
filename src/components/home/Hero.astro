@@ -7,8 +7,6 @@ import deskClose from '../../assets/room/desk-close.jpg';
 import deskCloseP from '../../assets/room/desk-close-p.jpg';
 import ScenePicture from '../room/ScenePicture.astro';
 import { coverVars, letterVars } from '../room/scene';
-import Lockup from '../logo/Lockup.tsx';
-import EntranceGaze from '../motion/EntranceGaze.astro';
 import { useDict } from '../../i18n';
 import { type Locale, REPO, USE_GITHUB_RELEASES_CTA } from '../../consts.ts';
 
@@ -32,15 +30,6 @@ const downloadHref = USE_GITHUB_RELEASES_CTA ? REPO.releases : locale === 'en' ?
   </div>
 
   <div class="hero-copy relative mx-auto flex h-full max-w-6xl flex-col px-5 md:px-8" style={letterVars('close')}>
-    <EntranceGaze>
-      <Lockup
-        variant="horizontal"
-        symbolSize={84}
-        wordmarkSize={32}
-        className="gaze-word mb-8 text-ink max-md:hidden"
-      />
-    </EntranceGaze>
-
     <h1 class="hero-reveal max-w-[13em] whitespace-pre-line text-display text-ink" style="--i:1">
       {t.hero.title}
     </h1>
