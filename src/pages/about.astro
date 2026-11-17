@@ -6,6 +6,7 @@ import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import ShotSlot from '../components/layout/ShotSlot.astro';
 import { SITE_REPO, REPO, SITE } from '../consts';
 
 const locale = 'zh' as const;
@@ -35,6 +36,8 @@ const { Content } = await render(entry);
         </p>
       </div>
     </section>
+
+    <ShotSlot id="P1" scene="大厅（多分身）" class="mt-12" />
 
     <!-- 创作手记全文 -->
     <article class="mx-auto mt-20 max-w-3xl px-5 md:px-8">

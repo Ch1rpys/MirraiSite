@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-16T15:38:17.707Z",
+  "fetchedAt": "2026-11-17T02:49:26.603Z",
   "releases": [
     {
       "version": "v1.3.0",
@@ -19,7 +19,8 @@
           "size": 370081707,
           "downloadUrl": "https://github.com/Ch1rpys/Mirrai/releases/download/v1.3.0/Mirrai-Setup-x64.exe"
         }
-      ]
+      ],
+      "checksums": {}
     },
     {
       "version": "v1.2.0",
@@ -39,7 +40,8 @@
           "size": 352458812,
           "downloadUrl": "https://github.com/Ch1rpys/Mirrai/releases/download/v1.2.0/Mirrai-Setup-x64.exe"
         }
-      ]
+      ],
+      "checksums": {}
     },
     {
       "version": "v1.1.0",
@@ -59,7 +61,8 @@
           "size": 352137109,
           "downloadUrl": "https://github.com/Ch1rpys/Mirrai/releases/download/v1.1.0/Mirrai-Setup-x64.exe"
         }
-      ]
+      ],
+      "checksums": {}
     },
     {
       "version": "v1.0.0",
@@ -74,7 +77,8 @@
           "size": 579935017,
           "downloadUrl": "https://github.com/Ch1rpys/Mirrai/releases/download/v1.0.0/Mirrai-macOS-arm64.dmg"
         }
-      ]
+      ],
+      "checksums": {}
     },
     {
       "version": "v0.1.0",
@@ -83,7 +87,8 @@
       "prerelease": true,
       "htmlUrl": "https://github.com/Ch1rpys/Mirrai/releases/tag/v0.1.0",
       "body": "历史基线标记：仓库历史的起点，用于让后续 Release 的贡献者统计有正确的对比范围。此版本无对应构建产物。",
-      "assets": []
+      "assets": [],
+      "checksums": {}
     }
   ]
 }

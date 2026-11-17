@@ -6,6 +6,7 @@ import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
+import ShotSlot from '../../components/layout/ShotSlot.astro';
 import { SITE_REPO, REPO, SITE } from '../../consts';
 
 const locale = 'en' as const;
@@ -37,6 +38,7 @@ const { Content } = await render(entry);
     </section>
 
     <!-- Creator's notes, full text -->
+    <ShotSlot id="P1" scene="Lobby (multiple personas)" class="mt-12" />
     <article class="mx-auto mt-20 max-w-3xl px-5 md:px-8">
       <div class="text-[0.8rem] tracking-[0.22em] text-lamp-deep">Creator's notes</div>
       <div class="prose-garamond mt-6 text-ink-muted">

@@ -1,6 +1,7 @@
 ---
 import { useDict } from '../../i18n';
 import type { Locale } from '../../consts.ts';
+import ShotSlot from '../layout/ShotSlot.astro';
 
 interface Props {
   locale: Locale;
@@ -27,6 +28,12 @@ const s = t.sections.absent;
         ))
       }
     </div>
+
+    <ShotSlot
+      id="P6"
+      scene={locale === 'en' ? 'Letters (write down / send)' : '信（写下来 / 交出去）'}
+      class="mt-12"
+    />
 
     <!-- 时间痕迹：时区排版 -->
     <div class="mt-12 flex flex-wrap gap-x-10 gap-y-4 text-[0.78rem] tracking-[0.16em] text-ink-muted" aria-hidden="true">

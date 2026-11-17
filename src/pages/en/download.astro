@@ -134,7 +134,8 @@ const fmtSize = (bytes: number) =>
                       <td class="px-4 py-3 text-ink">{a.name}</td>
                       <td class="px-4 py-3 text-ink-muted">
                         <span class="block break-all text-[0.78rem]">
-                          See the SHA256SUMS file included with the Release
+                          {(latest as any).checksums?.[a.name] ??
+                            'See the SHA256SUMS file included with the Release'}
                         </span>
                       </td>
                     </tr>

@@ -2,6 +2,7 @@
 import PrerecordedDemo from '../demo/PrerecordedDemo.tsx';
 import GraduationFade from '../motion/GraduationFade.astro';
 import MessageTrace from '../motion/MessageTrace.astro';
+import ShotSlot from '../layout/ShotSlot.astro';
 import { useDict } from '../../i18n';
 import type { Locale } from '../../consts.ts';
 
@@ -25,6 +26,17 @@ const s = t.sections.graduation;
 
     <div class="mt-14">
       <PrerecordedDemo client:visible locale={locale} />
+    </div>
+
+    <div class="mt-14 grid gap-6 md:grid-cols-2">
+      <ShotSlot
+        id="P5"
+        scene={locale === 'en' ? 'Graduation / farewell letter' : '毕业 / 告别信'}
+      />
+      <ShotSlot
+        id="P2"
+        scene={locale === 'en' ? 'Conversation (emotion + memory recall)' : '对话界面（情感状态 + 记忆召回）'}
+      />
     </div>
 
     <GraduationFade class="mt-20">

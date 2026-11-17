@@ -11,7 +11,41 @@ const outFile = join(outDir, 'releases.json');
 
 const API = 'https://api.github.com/repos/Ch1rpys/Mirrai/releases?per_page=20';
 
-function normalize(raw) {
+async function fetchChecksums(assets) {
+  // 发版 CI 附带校验和：<file>.sha256 或聚合的 SHA256SUMS；解析成 { 文件名: 哈希 }
+  const sums = {};
+  for (const a of assets) {
+    if (!a.name.endsWith('.sha256') && a.name !== 'SHA256SUMS') continue;
+    try {
+      const res = await fetch(a.downloadUrl);
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (a.name === 'SHA256SUMS') {
+        for (const line of text.split('\n')) {
+          const m = line.trim().split(/\s+/);
+          if (m[0] && /^[0-9a-f]{64}$/i.test(m[0]) && m[1]) {
+            sums[m[1].replace(/^.*\//, '')] = m[0];
+          }
+        }
+      } else {
+        const m = text.trim().split(/\s+/);
+        if (m[0] && /^[0-9a-f]{64}$/i.test(m[0])) {
+          sums[m[1] ? m[1].replace(/^.*\//, '') : a.name.replace(/\.sha256$/, '')] = m[0];
+        }
+      }
+    } catch {
+      /* 单个校验和失败不影响整体 */
+    }
+  }
+  return sums;
+}
+
+async function normalize(raw) {
+  const assets = (raw.assets || []).map((a) => ({
+    name: a.name,
+    size: a.size,
+    downloadUrl: a.browser_download_url,
+  }));
   return {
     version: raw.tag_name,
     name: raw.name || raw.tag_name,
@@ -19,11 +53,8 @@ function normalize(raw) {
     prerelease: raw.prerelease,
     htmlUrl: raw.html_url,
     body: raw.body || '',
-    assets: (raw.assets || []).map((a) => ({
-      name: a.name,
-      size: a.size,
-      downloadUrl: a.browser_download_url,
-    })),
+    assets,
+    checksums: await fetchChecksums(assets),
   };
 }
 
@@ -37,7 +68,7 @@ try {
   });
   if (!res.ok) throw new Error(`GitHub API ${res.status}`);
   const raw = await res.json();
-  const releases = raw.map(normalize);
+  const releases = await Promise.all(raw.map(normalize));
 
   mkdirSync(outDir, { recursive: true });
   writeFileSync(outFile, JSON.stringify({ fetchedAt: new Date().toISOString(), releases }, null, 2));

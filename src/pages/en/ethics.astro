@@ -7,6 +7,7 @@
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/layout/Header.astro';
 import Footer from '../../components/layout/Footer.astro';
+import ShotSlot from '../../components/layout/ShotSlot.astro';
 
 const locale = 'en' as const;
 
@@ -124,6 +125,8 @@ const helps = [
     </section>
 
     <!-- One-line privacy link -->
+    <ShotSlot id="P8" scene="Settings · privacy / graduation modes" class="mt-16" />
+
     <p class="mt-16 text-[0.95rem] text-ink-muted">
       For the full picture on data and privacy, see
       <a class="link-quiet" href="/en/privacy">Privacy →</a>

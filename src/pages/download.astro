@@ -139,8 +139,9 @@ const fmtSize = (bytes: number) =>
                     <tr class="hairline border-b last:border-b-0">
                       <td class="px-4 py-3 text-ink">{a.name}</td>
                       <td class="px-4 py-3 text-ink-muted">
-                        <span class="block break-all text-[0.78rem]">
-                          见 Release 附带的 SHA256SUMS 文件
+                        <span class="block break-all text-[0.78rem]" data-sha={a.name}>
+                          {(latest as any).checksums?.[a.name] ??
+                            '见 Release 附带的 SHA256SUMS 文件'}
                         </span>
                       </td>
                     </tr>

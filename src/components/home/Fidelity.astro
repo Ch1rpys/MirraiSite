@@ -1,6 +1,7 @@
 ---
 import { useDict } from '../../i18n';
 import type { Locale } from '../../consts.ts';
+import ShotSlot from '../layout/ShotSlot.astro';
 
 interface Props {
   locale: Locale;
@@ -53,5 +54,11 @@ const s = t.sections.fidelity;
       </ul>
       <p class="mt-5 text-[0.95rem] text-ink-muted">{s.local}</p>
     </div>
+
+    <ShotSlot
+      id="P7"
+      scene={locale === 'en' ? 'Persona profile (7 layers)' : '人格档案页（7 层人设）'}
+      class="mt-12"
+    />
   </div>
 </section>
